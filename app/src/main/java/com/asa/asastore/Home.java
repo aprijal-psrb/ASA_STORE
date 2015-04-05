@@ -21,12 +21,18 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.NameValuePair;
@@ -92,13 +98,13 @@ public class Home extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         AlertDialog.Builder edit = new AlertDialog.Builder(getActivity());
                         View mView = inflater.inflate(R.layout.edit_product_detail, null);
-                        TextView tvNameEdit = (TextView) mView.findViewById(R.id.TextView_product_name);
-                        TextView tvBrandEdit = (TextView) mView.findViewById(R.id.TextView_product_brand);
-                        TextView tvPriceEdit = (TextView) mView.findViewById(R.id.TextView_product_price);
-                        TextView tvNumUnitEdit = (TextView) mView.findViewById(R.id.TextView_product_num_unit);
-                        TextView tvCategoryEdit = (TextView) mView.findViewById(R.id.TextView_product_category);
-                        TextView tvSupplierEdit = (TextView) mView.findViewById(R.id.TextView_product_supplier);
-                        TextView tvDescEdit = (TextView) mView.findViewById(R.id.TextView_product_description);
+                        final EditText tvNameEdit = (EditText) mView.findViewById(R.id.editText_product_name);
+                        EditText tvBrandEdit = (EditText) mView.findViewById(R.id.editText_product_brand);
+                        final EditText tvPriceEdit = (EditText) mView.findViewById(R.id.editText_product_price);
+                        final EditText tvNumUnitEdit = (EditText) mView.findViewById(R.id.editText_product_num_unit);
+                        final EditText tvCategoryEdit = (EditText) mView.findViewById(R.id.editText_product_category);
+                        EditText tvSupplierEdit = (EditText) mView.findViewById(R.id.editText_product_supplier);
+                        final EditText tvDescEdit = (EditText) mView.findViewById(R.id.editText_product_description);
                         tvNameEdit.setText(tvName.getText().toString());
                         tvBrandEdit.setText(tvBrand.getText().toString());
                         tvPriceEdit.setText(price);
@@ -110,7 +116,15 @@ public class Home extends Fragment {
                         edit.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-
+                                DataBarang barang = new DataBarang();
+                                barang.setId_barang(MainActivity.listDataBarang.get(position).getId_barang());
+                                barang.setNama_barang(tvNameEdit.getText().toString());
+                                barang.setHarga_barang(tvPriceEdit.getText().toString());
+                                barang.setStok_barang(tvNumUnitEdit.getText().toString());
+                                barang.setKategori_barang(tvCategoryEdit.getText().toString());
+                                barang.setDeskripsi_barang(tvDescEdit.getText().toString());
+                                barang.setPosition(position);
+                                new EditBarang().execute(barang);
                             }
                         });
                         edit.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -177,7 +191,88 @@ public class Home extends Fragment {
             }
 
         });
+        Button btnTambahBarang = (Button)rootView.findViewById(R.id.btnTambahBarang);
+        btnTambahBarang.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final LayoutInflater inflater = getActivity().getLayoutInflater();
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+                View mView = inflater.inflate(R.layout.add_data_barang, null);
+                final EditText nama = (EditText) mView.findViewById(R.id.editText_product_name);
+                final AutoCompleteTextView merek = (AutoCompleteTextView)mView.findViewById(R.id.TextView_product_brand);
+                final EditText harga = (EditText) mView.findViewById(R.id.editText_product_price);
+                final EditText jumlahBarang = (EditText) mView.findViewById(R.id.editText_product_stock);
+                final AutoCompleteTextView satuan = (AutoCompleteTextView) mView.findViewById(R.id.autoComp_product_unit);
+                final Spinner kategori = (Spinner) mView.findViewById(R.id.spinner_product_category);
+                final Spinner penjual = (Spinner) mView.findViewById(R.id.spinner_supplier);
+                final Button btnAddSupplier = (Button)mView.findViewById(R.id.btn_add_supplier);
+                final EditText deskripsi = (EditText) mView.findViewById(R.id.editText_product_description);
+                btnAddSupplier.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog.Builder tambahDialog = new AlertDialog.Builder(getActivity());
+                        View viewTambah = inflater.inflate(R.layout.add_data_supplier,null);
+                        final EditText namaToko = (EditText)viewTambah.findViewById(R.id.editText_supplier_name);
+                        final EditText alamatToko = (EditText)viewTambah.findViewById(R.id.editText_supplier_address);
+                        final EditText kontakToko = (EditText)viewTambah.findViewById(R.id.editText_supplier_contact);
+                        tambahDialog.setView(viewTambah);
+                        tambahDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                DataSupplier supplier = new DataSupplier();
+                                supplier.setNama_toko(namaToko.getText().toString());
+                                supplier.setAlamat_toko(alamatToko.getText().toString());
+                                supplier.setKontak_toko(kontakToko.getText().toString());
+                                new NewSupplier().execute(supplier);
+                            }
+                        });
+                        tambahDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
 
+                            }
+                        });
+                        tambahDialog.show();
+                    }
+                });
+                merek.setAdapter(MainActivity.adapterMerek);
+                List<String> listSatuan = new ArrayList<>();
+                listSatuan.add("Unit");
+                listSatuan.add("Kotak");
+                listSatuan.add("Lusin");
+                listSatuan.add("Botol");
+                ArrayAdapter adapterSatuan = new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1,listSatuan);
+                satuan.setAdapter(adapterSatuan);
+                List<String> listKategori = new ArrayList<>();
+                listKategori.add("Elektronik");
+                listKategori.add("Automotif");
+                ArrayAdapter adapterKategory = new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1,listKategori);
+                kategori.setAdapter(adapterKategory);
+                penjual.setAdapter(MainActivity.adapterNamaToko);
+                dialog.setView(mView);
+                dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        DataBarang barang = new DataBarang();
+                        barang.setNama_barang(nama.getText().toString());
+                        barang.setMerek_barang(merek.getText().toString());
+                        barang.setHarga_barang(harga.getText().toString());
+                        barang.setStok_barang(jumlahBarang.getText().toString());
+                        barang.setSatuan_barang(satuan.getText().toString());
+                        barang.setKategori_barang(kategori.getSelectedItem().toString());
+                        barang.setId_penjual(penjual.getSelectedItem().toString());
+                        barang.setDeskripsi_barang(deskripsi.getText().toString());
+                    }
+                });
+                dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                dialog.show();
+            }
+        });
         return rootView;
     }
 
@@ -187,17 +282,19 @@ public class Home extends Fragment {
             List<NameValuePair> ls = new ArrayList<>();
             ls.add(new BasicNameValuePair("id_favorite", arg[0]));
             ls.add(new BasicNameValuePair("id_barang", arg[1]));
-            try {
-                JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/set-favorite.php", "POST", ls);
-            } catch (Exception e) {
-                e.printStackTrace();
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/set-favorite.php", "POST", ls);
+            if(json == null){
+                return 1;
             }
-
-            return null;
+            return 0;
         }
         @Override
         public void onPostExecute(Integer arg){
-            MainActivity.adapterHomeBarang.notifyDataSetChanged();
+            if(arg == 0) {
+                MainActivity.adapterHomeBarang.notifyDataSetChanged();
+            }else{
+                Toast.makeText(getActivity(),"Error Occurred",Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -207,35 +304,99 @@ public class Home extends Fragment {
             String id_barang = MainActivity.listDataBarang.get(params[0]).getId_barang();
             List<NameValuePair> ls = new ArrayList<>();
             ls.add(new BasicNameValuePair("id_barang", id_barang));
-            try {
-                JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/del-barang.php", "POST", ls);
-            } catch (Exception e) {
-                e.printStackTrace();
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/del-barang.php", "POST", ls);
+            if(json == null){
+                return 1;
             }
-
-            return null;
+            return 0;
         }
         @Override
         public void onPostExecute(Integer arg){
-            MainActivity.adapterHomeBarang.notifyDataSetChanged();
+            if(arg == 0) {
+                MainActivity.adapterHomeBarang.notifyDataSetChanged();
+            }else{
+                Toast.makeText(getActivity(),"Error Occurred",Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
-    private class ClearFavorite extends AsyncTask<String,Void,Void> {
+    private class ClearFavorite extends AsyncTask<String,Void,Integer> {
         @Override
-        protected Void doInBackground(String... params) {
+        protected Integer doInBackground(String... params) {
             List<NameValuePair> ls = new ArrayList<>();
             ls.add(new BasicNameValuePair("id_barang",params[0]));
-            try {
-                JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/clear-favorite.php", "POST", ls);
-            } catch (Exception e) {
-                e.printStackTrace();
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/clear-favorite.php", "POST", ls);
+            if(json == null){
+                return 1;
             }
-            return null;
+            return 0;
         }
         @Override
-        public void onPostExecute(Void arg){
-            MainActivity.adapterHomeBarang.notifyDataSetChanged();
+        public void onPostExecute(Integer arg){
+            if(arg == 0) {
+                MainActivity.adapterHomeBarang.notifyDataSetChanged();
+            }else{
+                Toast.makeText(getActivity(),"Error Occurred",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private class EditBarang extends AsyncTask<DataBarang,Void,Integer>{
+        DataBarang barang = new DataBarang();
+        @Override
+        protected Integer doInBackground(DataBarang... params){
+            barang = params[0];
+            List<NameValuePair> ls = new ArrayList<>();
+            ls.add(new BasicNameValuePair("id_barang",barang.getId_barang()));
+            ls.add(new BasicNameValuePair("nama_barang",barang.getNama_barang()));
+            ls.add(new BasicNameValuePair("harga_barang",barang.getHarga_barang()));
+            ls.add(new BasicNameValuePair("stok_barang",barang.getStok_barang()));
+            ls.add(new BasicNameValuePair("kategori_barang",barang.getKategori_barang()));
+            ls.add(new BasicNameValuePair("deskripsi_barang",barang.getDeskripsi_barang()));
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/edit-barang.php","POST",ls);
+            if(json == null){
+                return 1;
+            }
+            return 0;
+        }
+        @Override
+        protected void onPostExecute(Integer arg){
+            if(arg == 0){
+                MainActivity.listDataBarang.get(barang.getPosition()).setNama_barang(barang.getNama_barang());
+                MainActivity.listDataBarang.get(barang.getPosition()).setHarga_barang(barang.getHarga_barang());
+                MainActivity.listDataBarang.get(barang.getPosition()).setStok_barang(barang.getStok_barang());
+                MainActivity.listDataBarang.get(barang.getPosition()).setKategori_barang(barang.getKategori_barang());
+                MainActivity.listDataBarang.get(barang.getPosition()).setDeskripsi_barang(barang.getDeskripsi_barang());
+                MainActivity.adapterHomeBarang.notifyDataSetChanged();
+            }else{
+                Toast.makeText(getActivity(),"Error Occurred",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private class NewBarang extends AsyncTask<DataBarang,Void,Integer>{
+        DataBarang barang;
+        @Override
+        protected Integer doInBackground(DataBarang... params) {
+            List<NameValuePair> ls = new ArrayList<>();
+            ls.add(new BasicNameValuePair("nama_barang",barang.getNama_barang()));
+            ls.add(new BasicNameValuePair("harga_barang",barang.getHarga_barang()));
+            ls.add(new BasicNameValuePair("stok_barang",barang.getStok_barang()));
+            ls.add(new BasicNameValuePair("kategori_barang",barang.getKategori_barang()));
+            ls.add(new BasicNameValuePair("deskripsi_barang",barang.getDeskripsi_barang()));
+            //JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/edit-barang.php","POST",ls);
+            //if(json == null){
+            //    return 1;
+            //}
+            return 0;
+        }
+    }
+
+    private class NewSupplier extends AsyncTask<DataSupplier,Void,Integer>{
+
+        @Override
+        protected Integer doInBackground(DataSupplier... params) {
+            return null;
         }
     }
 }
