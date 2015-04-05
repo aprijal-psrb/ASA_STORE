@@ -114,9 +114,6 @@ public class Favorite extends Fragment {
                                             public void onClick(DialogInterface dialog, int id) {
                                                 String id_favorite = MainActivity.listDataFavorite.get(position).getId_favorite();
                                                 String nama_favorite = editText.getText().toString();
-                                                MainActivity.listDataFavorite.get(position).setId_favorite(id_favorite);
-                                                MainActivity.listDataFavorite.get(position).setWarna_favorite(mColor);
-                                                MainActivity.listDataFavorite.get(position).setNama_favorite(nama_favorite);
                                                 new EditCategory().execute(id_favorite, mColor, nama_favorite, "" + position);
 
                                             }
@@ -133,8 +130,6 @@ public class Favorite extends Fragment {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         new DeleteData().execute(position);
-                                        MainActivity.listDataFavorite.remove(position);
-                                        MainActivity.adapterFavoriteCategory.notifyDataSetChanged();
                                     }
                                 }).setNegativeButton("NO",new DialogInterface.OnClickListener() {
                                     @Override
@@ -171,7 +166,6 @@ public class Favorite extends Fragment {
                             public void onCancel(AmbilWarnaDialog dialog) {
 
                             }
-
                             @Override
                             public void onOk(AmbilWarnaDialog dialog, int color) {
                                 imgColor.setBackgroundColor(color);
@@ -184,10 +178,7 @@ public class Favorite extends Fragment {
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-
-
                                 new AddCategory().execute(mColor,editText.getText().toString());
-                                //new GetData().execute();
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -202,29 +193,21 @@ public class Favorite extends Fragment {
 
     private class AddCategory extends AsyncTask<String,Void,Integer>{
         @Override
-        protected void onPreExecute(){
-
-        }
-        @Override
         protected Integer doInBackground(String... arg) {
             String color = arg[0];
             String nama_favorite = arg[1];
-            List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair("warna_favorite",color));
-            params.add(new BasicNameValuePair("nama_favorite",nama_favorite));
-            try{
-            JSONParser jsonParser = new JSONParser();
-            JSONObject json = jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/add-favorite_category.php","POST",params);
-            }catch (Exception e){
-                e.printStackTrace();
+            List<NameValuePair> post = new ArrayList<>();
+            post.add(new BasicNameValuePair("warna_favorite",color));
+            post.add(new BasicNameValuePair("nama_favorite",nama_favorite));
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/add-favorite_category.php","POST",post);
+            if(json == null){
+                return 1;
             }
-
-            List<NameValuePair> all = new ArrayList<>();
-            JSONObject jsonObject = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-favorite.php","GET",all);
+            List<NameValuePair> get = new ArrayList<>();
+            JSONObject jsonObject = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-favorite.php","GET",get);
             if(jsonObject == null){
-                return 0;
+                return 1;
             }
-            DataFavorite data = new DataFavorite();
             try{
                 int success = jsonObject.getInt("success");
                 if (success == 1){
@@ -235,24 +218,28 @@ public class Favorite extends Fragment {
                         String warna_favorite = c.getString("warna_favorite");
                         String namafavorite = c.getString("nama_favorite");
                         String deskripsi = c.getString("deskripsi");
+                        DataFavorite data = new DataFavorite();
                         data.setId_favorite(id_favorite);
                         data.setWarna_favorite(warna_favorite);
                         data.setNama_favorite(namafavorite);
                         data.setDeskripsi(deskripsi);
+                        MainActivity.listDataFavorite.add(data);
                     }
                 }else{
-                    return 0;
+                    return 1;
                 }
             }catch (JSONException e){
                 e.printStackTrace();
             }
-            MainActivity.listDataFavorite.add(data);
-            return null;
+            return 0;
         }
         @Override
         protected void onPostExecute(Integer arg){
-            MainActivity.adapterFavoriteCategory.notifyDataSetChanged();
-
+            if(arg == 1) {
+                Toast.makeText(getActivity(),"Error Occurred!",Toast.LENGTH_SHORT).show();
+            }else{
+                MainActivity.adapterFavoriteCategory.notifyDataSetChanged();
+            }
         }
     }
 
@@ -262,32 +249,47 @@ public class Favorite extends Fragment {
             String id_favorite = MainActivity.listDataFavorite.get(params[0]).getId_favorite();
             List<NameValuePair> ls = new ArrayList<>();
             ls.add(new BasicNameValuePair("id_favorite",id_favorite));
-            try{
-                JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/del-favorite_category.php","POST",ls);
-            }catch (Exception e){
-                e.printStackTrace();
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/del-favorite_category.php","POST",ls);
+                if(json == null){
+                    return null;
+                }
+            return params[0];
+        }
+        @Override
+        protected void onPostExecute(Integer arg){
+            if(arg == null) {
+                Toast.makeText(getActivity(),"Error Occurred!",Toast.LENGTH_SHORT).show();
+            }else{
+                MainActivity.listDataFavorite.remove((int) arg);
+                MainActivity.adapterFavoriteCategory.notifyDataSetChanged();
             }
-            return null;
         }
     }
 
-    private class EditCategory extends AsyncTask<String,Void,Integer> {
+    private class EditCategory extends AsyncTask<String,Void,String[]> {
         @Override
-        protected Integer doInBackground(String... params) {
+        protected String[] doInBackground(String... params) {
             List<NameValuePair> ls = new ArrayList<>();
             ls.add(new BasicNameValuePair("id_favorite",params[0]));
             ls.add(new BasicNameValuePair("warna_favorite",params[1]));
             ls.add(new BasicNameValuePair("nama_favorite",params[2]));
-            try{
-                JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/update-favorite.php","POST",ls);
-            }catch (Exception e){
-                e.printStackTrace();
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/update-favorite.php","POST",ls);
+            if(json == null){
+                return null;
             }
-            return null;
+            return new String[]{params[0],params[1],params[2],params[3]};
         }
         @Override
-        protected void onPostExecute(Integer arg){
-            MainActivity.adapterFavoriteCategory.notifyDataSetChanged();
+        protected void onPostExecute(String[] arg){
+            if(arg == null) {
+                Toast.makeText(getActivity(),"Error Occurred!",Toast.LENGTH_SHORT).show();
+            }else{
+                int position = Integer.valueOf(arg[3]);
+                MainActivity.listDataFavorite.get(position).setId_favorite(arg[0]);
+                MainActivity.listDataFavorite.get(position).setWarna_favorite(arg[1]);
+                MainActivity.listDataFavorite.get(position).setNama_favorite(arg[2]);
+                MainActivity.adapterFavoriteCategory.notifyDataSetChanged();
+            }
         }
     }
 }
