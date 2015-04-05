@@ -71,6 +71,7 @@ public class JSONParser {
             json = sb.toString();
         }catch (Exception e){
             Log.e("Buffer Error","Error converting result "+e.toString());
+            return null;
         }
         try{
             jObj = new JSONObject(json);
