@@ -4,50 +4,50 @@ public class DataBarang{
     private String 	id_barang,id_user,id_merek,id_penjual,id_gambar,nama_barang,stok_barang,satuan_barang,harga_barang,tgl_harga_stok_barang,kode_barang,lokasi_barang,kategori_barang,deskripsi_barang,id_favorite;
 
     public DataBarang(){}
-    public void setId_barang(String arg){
-        this.id_barang = arg;
+    public void setId_barang(String id_barang){
+        this.id_barang = id_barang;
     }
-    public void setId_user(String arg){
-        this.id_user = arg;
+    public void setId_user(String id_user){
+        this.id_user = id_user;
     }
-    public void setId_merek(String arg){
-        this.id_merek = arg;
+    public void setId_merek(String id_merek){
+        this.id_merek = id_merek;
     }
-    public void setId_penjual(String arg){
-        this.id_penjual = arg;
+    public void setId_penjual(String id_penjual){
+        this.id_penjual = id_penjual;
     }
-    public void setId_gambar(String arg){
-        this.id_gambar = arg;
+    public void setId_gambar(String id_gambar){
+        this.id_gambar = id_gambar;
     }
-    public void setNama_barang(String arg){
-        this.nama_barang = arg;
+    public void setNama_barang(String nama_barang){
+        this.nama_barang = nama_barang;
     }
-    public void setStok_barang(String arg){
-        this.stok_barang = arg;
+    public void setStok_barang(String stok_barang){
+        this.stok_barang = stok_barang;
     }
-    public void setSatuan_barang(String arg){
-        this.satuan_barang = arg;
+    public void setSatuan_barang(String satuan_barang){
+        this.satuan_barang = satuan_barang;
     }
-    public void setHarga_barang(String arg){
-        this.harga_barang = arg;
+    public void setHarga_barang(String harga_barang){
+        this.harga_barang = harga_barang;
     }
-    public void setTgl_harga_stok_barang(String arg){
-        this.tgl_harga_stok_barang = arg;
+    public void setTgl_harga_stok_barang(String tgl_harga_stok_barang){
+        this.tgl_harga_stok_barang = tgl_harga_stok_barang;
     }
-    public void setKode_barang(String arg){
-        this.kode_barang = arg;
+    public void setKode_barang(String kode_barang){
+        this.kode_barang = kode_barang;
     }
-    public void setLokasi_barang(String arg){
-        this.lokasi_barang = arg;
+    public void setLokasi_barang(String lokasi_barang){
+        this.lokasi_barang = lokasi_barang;
     }
-    public void setKategori_barang(String arg){
-        this.kategori_barang = arg;
+    public void setKategori_barang(String kategori_barang){
+        this.kategori_barang = kategori_barang;
     }
-    public void setDeskripsi_barang(String arg){
-        this.deskripsi_barang = arg;
+    public void setDeskripsi_barang(String deskripsi_barang){
+        this.deskripsi_barang = deskripsi_barang;
     }
-    public void setId_favorite(String arg){
-        this.id_favorite = arg;
+    public void setId_favorite(String id_favorite){
+        this.id_favorite = id_favorite;
     }
     public String getId_barang(){
         return this.id_barang;
