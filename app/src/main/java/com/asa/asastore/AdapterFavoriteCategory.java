@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by APRIJAL_PASARIBU on 03/04/2015.
  */
-public class AdapterFavoriteCategory extends ArrayAdapter<ArrayList<String>> {
+public class AdapterFavoriteCategory extends ArrayAdapter<DataFavorite> {
     public AdapterFavoriteCategory(Context context, int resource) {
         super(context, resource);
     }
@@ -24,19 +24,19 @@ public class AdapterFavoriteCategory extends ArrayAdapter<ArrayList<String>> {
         super(context, resource, textViewResourceId);
     }
 
-    public AdapterFavoriteCategory(Context context, int resource, ArrayList<String>[] objects) {
+    public AdapterFavoriteCategory(Context context, int resource, DataFavorite[] objects) {
         super(context, resource, objects);
     }
 
-    public AdapterFavoriteCategory(Context context, int resource, int textViewResourceId, ArrayList<String>[] objects) {
+    public AdapterFavoriteCategory(Context context, int resource, int textViewResourceId, DataFavorite[] objects) {
         super(context, resource, textViewResourceId, objects);
     }
 
-    public AdapterFavoriteCategory(Context context, int resource, List<ArrayList<String>> objects) {
+    public AdapterFavoriteCategory(Context context, int resource, List<DataFavorite> objects) {
         super(context, resource, objects);
     }
 
-    public AdapterFavoriteCategory(Context context, int resource, int textViewResourceId, List<ArrayList<String>> objects) {
+    public AdapterFavoriteCategory(Context context, int resource, int textViewResourceId, List<DataFavorite> objects) {
         super(context, resource, textViewResourceId, objects);
     }
 
@@ -47,12 +47,12 @@ public class AdapterFavoriteCategory extends ArrayAdapter<ArrayList<String>> {
             vi = LayoutInflater.from(getContext());
             view = vi.inflate(R.layout.list_item_favorite_category,null);
         }
-        List<String> list = getItem(position);
-        String id_favorite = list.get(0);
-        String warna_favorite = list.get(1);
-        String nama_favorite = list.get(2);
-        String deskripsi = list.get(3);
-        if(list != null){
+        DataFavorite dataFavorite = getItem(position);
+        String id_favorite = dataFavorite.getId_favorite();
+        String warna_favorite = dataFavorite.getWarna_favorite();
+        String nama_favorite = dataFavorite.getNama_favorite();
+        String deskripsi = dataFavorite.getDeskripsi();
+        if(dataFavorite != null){
             TextView namaFavorite = (TextView)view.findViewById(R.id.categoryName);
             ImageView imageView = (ImageView)view.findViewById(R.id.image_list_category);
             namaFavorite.setText(nama_favorite);
