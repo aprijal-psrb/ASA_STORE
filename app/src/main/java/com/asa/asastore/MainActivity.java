@@ -22,7 +22,7 @@ import java.util.List;
 
 public class MainActivity extends FragmentActivity implements ViewPager.OnPageChangeListener,ActionBar.TabListener{
     public static JSONParser jsonParser = new JSONParser();
-    public static AdapterHomeBarang adapterHomeBarang;
+    public static AdapterBarang adapterHomeBarang;
     public static AdapterShoppingSupplier adapterShoppingSupplier;
     public static AdapterFavoriteCategory adapterFavoriteCategory;
     public static List<DataBarang> listDataBarang = new ArrayList<>();
@@ -32,6 +32,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
     MyPagerAdapter mPagerAdapter;
     ViewPager mViewPager;
     ActionBar actionBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,11 +48,13 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
         actionBar.addTab(actionBar.newTab().setIcon(R.drawable.belanja_status).setTabListener(this));
         actionBar.addTab(actionBar.newTab().setIcon(R.drawable.favorite_status).setTabListener(this));
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -62,26 +65,33 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
     }
+
     @Override
     public void onPageSelected(int position) {
         getActionBar().setSelectedNavigationItem(position);
     }
+
     @Override
     public void onPageScrollStateChanged(int state) {
     }
+
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
         mViewPager.setCurrentItem(tab.getPosition());
     }
+
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
     }
+
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
     }
+
     public class MyPagerAdapter extends FragmentStatePagerAdapter {
         public MyPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -98,33 +108,32 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
             }
             return null;
         }
+
         @Override
         public int getCount() {
             return 3;
         }
+
         @Override
         public CharSequence getPageTitle(int position) {
             return "OBJECT " + (position + 1);
         }
     }
+
     public class GetData extends AsyncTask<String,Integer,Integer>{
-        int success;
         @Override
         protected void onPreExecute(){
             super.onPreExecute();
         }
         @Override
         protected Integer doInBackground(String... params) {
-            //if(TAG == 1){
-            //    return 2;
-            //}
             List<NameValuePair> all = new ArrayList<>();
                 JSONObject jsonObject = jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-barang.php","GET",all);
             if(jsonObject == null){
                 return 1;
             }
             try{
-                success = jsonObject.getInt("success");
+                int success = jsonObject.getInt("success");
                 if (success == 1){
                     JSONArray all_barang = jsonObject.getJSONArray("all_barang");
                     listDataBarang.clear();
@@ -261,7 +270,6 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
             }catch (JSONException e){
                 e.printStackTrace();
             }
-
             return 0;
         }
         @Override
@@ -281,7 +289,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                 }).show();
             }
             if(arg == 0){
-                adapterHomeBarang = new AdapterHomeBarang(MainActivity.this,R.id.layout_item_home,listDataBarang);
+                adapterHomeBarang = new AdapterBarang(MainActivity.this,R.id.layout_item_home,listDataBarang);
                 Home.listViewBarang.setAdapter(adapterHomeBarang);
                 adapterShoppingSupplier = new AdapterShoppingSupplier(MainActivity.this,android.R.layout.simple_list_item_1,listDataSupplier);
                 Shopping.listViewSupplier.setAdapter(adapterShoppingSupplier);
