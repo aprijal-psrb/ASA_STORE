@@ -14,28 +14,9 @@ import java.util.List;
  * Created by APRIJAL_PASARIBU on 03/04/2015.
  */
 public class AdapterShoppingSupplier extends ArrayAdapter<DataSupplier> {
-    public AdapterShoppingSupplier(Context context, int resource) {
-        super(context, resource);
-    }
-
-    public AdapterShoppingSupplier(Context context, int resource, int textViewResourceId) {
-        super(context, resource, textViewResourceId);
-    }
-
-    public AdapterShoppingSupplier(Context context, int resource, DataSupplier[] objects) {
-        super(context, resource, objects);
-    }
-
-    public AdapterShoppingSupplier(Context context, int resource, int textViewResourceId, DataSupplier[] objects) {
-        super(context, resource, textViewResourceId, objects);
-    }
 
     public AdapterShoppingSupplier(Context context, int resource, List<DataSupplier> objects) {
         super(context, resource, objects);
-    }
-
-    public AdapterShoppingSupplier(Context context, int resource, int textViewResourceId, List<DataSupplier> objects) {
-        super(context, resource, textViewResourceId, objects);
     }
 
     @Override
