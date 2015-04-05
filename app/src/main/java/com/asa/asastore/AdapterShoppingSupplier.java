@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Created by APRIJAL_PASARIBU on 03/04/2015.
  */
-public class AdapterShoppingSupplier extends ArrayAdapter<ArrayList<String>> {
+public class AdapterShoppingSupplier extends ArrayAdapter<DataSupplier> {
     public AdapterShoppingSupplier(Context context, int resource) {
         super(context, resource);
     }
@@ -22,19 +22,19 @@ public class AdapterShoppingSupplier extends ArrayAdapter<ArrayList<String>> {
         super(context, resource, textViewResourceId);
     }
 
-    public AdapterShoppingSupplier(Context context, int resource, ArrayList<String>[] objects) {
+    public AdapterShoppingSupplier(Context context, int resource, DataSupplier[] objects) {
         super(context, resource, objects);
     }
 
-    public AdapterShoppingSupplier(Context context, int resource, int textViewResourceId, ArrayList<String>[] objects) {
+    public AdapterShoppingSupplier(Context context, int resource, int textViewResourceId, DataSupplier[] objects) {
         super(context, resource, textViewResourceId, objects);
     }
 
-    public AdapterShoppingSupplier(Context context, int resource, List<ArrayList<String>> objects) {
+    public AdapterShoppingSupplier(Context context, int resource, List<DataSupplier> objects) {
         super(context, resource, objects);
     }
 
-    public AdapterShoppingSupplier(Context context, int resource, int textViewResourceId, List<ArrayList<String>> objects) {
+    public AdapterShoppingSupplier(Context context, int resource, int textViewResourceId, List<DataSupplier> objects) {
         super(context, resource, textViewResourceId, objects);
     }
 
@@ -45,10 +45,10 @@ public class AdapterShoppingSupplier extends ArrayAdapter<ArrayList<String>> {
             vi = LayoutInflater.from(getContext());
             view = vi.inflate(android.R.layout.simple_list_item_1,null);
         }
-        ArrayList<String> list = getItem(position);
-        if(list != null){
+        DataSupplier dataSupplier = getItem(position);
+        if(dataSupplier != null){
             TextView textView1 = (TextView)view.findViewById(android.R.id.text1);
-            textView1.setText(list.get(2));
+            textView1.setText(dataSupplier.getNama_toko());
         }
         return view;
     }
