@@ -51,15 +51,12 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
     public static List<DataBarang> listDataBarang = new ArrayList<>();
     public static List<DataSupplier> listDataSupplier = new ArrayList<>();
     public static List<DataFavorite> listDataFavorite = new ArrayList<>();
-
-    //public static ArrayList<String> colorx = new ArrayList<>();
-    public static HashMap<String,String> color = new HashMap<>();
+    public static List<DataMerek> listDataMerek = new ArrayList<>();
     MyPagerAdapter mPagerAdapter;
     ViewPager mViewPager;
     ActionBar actionBar;
     ProgressDialog pDialog;
-    static JSONParser jsonParser = new JSONParser();
-    static HomeBarangAdapter adapterBarangHome;
+    public static JSONParser jsonParser = new JSONParser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -377,7 +374,6 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                     //listFavoriteCategory.clear();
                     //Favorite.listCategory = new ArrayList<>();
                     listDataFavorite.clear();
-                    color.clear();
                     for(int n = 0; n < favorite.length(); n++){
                         JSONObject c = favorite.getJSONObject(n);
                         String id_favorite = c.getString("id_favorite");
@@ -422,20 +418,28 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                 int success = jsonObject.getInt("success");
                 if (success == 1){
                     JSONArray merek = jsonObject.getJSONArray("merek");
-                    allMerek.clear();
-
+                    //allMerek.clear();
+                    listDataMerek.clear();
                     for(int n = 0; n < merek.length(); n++){
                         JSONObject c = merek.getJSONObject(n);
                         String id_merek = c.getString("id_merek");
                         String nama_merek = c.getString("nama_merek");
                         String logo_merek = c.getString("logo_merek");
                         String deskripsi_merek = c.getString("deskripsi_merek");
+                        /*
                         ArrayList<String> arrayList = new ArrayList<>();
                         arrayList.add(id_merek);
                         arrayList.add(nama_merek);
                         arrayList.add(logo_merek);
                         arrayList.add(deskripsi_merek);
                         allMerek.add(arrayList);
+                        */
+                        DataMerek dataMerek = new DataMerek();
+                        dataMerek.setId_merek(id_merek);
+                        dataMerek.setNama_merek(nama_merek);
+                        dataMerek.setLogo_merek(logo_merek);
+                        dataMerek.setDeskripsi_merek(deskripsi_merek);
+                        listDataMerek.add(dataMerek);
                     }
                 }else{
                     return 1;
@@ -487,13 +491,13 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                 TAG = 1;
                 //pDialog.dismiss();
 */
-                adapterHomeBarang = new AdapterHomeBarang(MainActivity.this,R.id.layout_item_home,listHomeBarang);
+                adapterHomeBarang = new AdapterHomeBarang(MainActivity.this,R.id.layout_item_home,listDataBarang);
                 Home.listViewBarang.setAdapter(adapterHomeBarang);
 
-                adapterShoppingSupplier = new AdapterShoppingSupplier(MainActivity.this,android.R.layout.simple_list_item_1,listShoppingSupplier);
+                adapterShoppingSupplier = new AdapterShoppingSupplier(MainActivity.this,android.R.layout.simple_list_item_1,listDataSupplier);
                 Shopping.listViewSupplier.setAdapter(adapterShoppingSupplier);
 
-                adapterFavoriteCategory = new AdapterFavoriteCategory(MainActivity.this,R.layout.list_item_favorite_category,listFavoriteCategory);
+                adapterFavoriteCategory = new AdapterFavoriteCategory(MainActivity.this,R.layout.list_item_favorite_category,listDataFavorite);
 
 
             }
