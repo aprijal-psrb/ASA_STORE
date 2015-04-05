@@ -1,7 +1,8 @@
 package com.asa.asastore;
 
 public class DataBarang{
-    private String 	id_barang,id_user,id_merek,id_penjual,id_gambar,nama_barang,stok_barang,satuan_barang,harga_barang,tgl_harga_stok_barang,kode_barang,lokasi_barang,kategori_barang,deskripsi_barang,id_favorite;
+    private String 	id_barang,id_user,id_merek,id_penjual,id_gambar,nama_barang,stok_barang,satuan_barang,harga_barang,tgl_harga_stok_barang,kode_barang,lokasi_barang,kategori_barang,deskripsi_barang,id_favorite,merek_barang;
+    private int position;
 
     public DataBarang(){}
 
@@ -65,8 +66,20 @@ public class DataBarang{
         this.id_favorite = id_favorite;
     }
 
+    public void setPosition(int position){
+        this.position = position;
+    }
+
+    public void setMerek_barang(String merek){
+        this.merek_barang = merek;
+    }
+
     public String getId_barang(){
         return this.id_barang;
+    }
+
+    public String getId_user(){
+        return this.id_user;
     }
 
     public String getId_merek(){
@@ -119,6 +132,14 @@ public class DataBarang{
 
     public String getId_favorite(){
         return this.id_favorite;
+    }
+
+    public int getPosition(){
+        return this.position;
+    }
+
+    public String getMerek_barang(){
+        return this.merek_barang;
     }
 
     public String getWarna_favorite(){
