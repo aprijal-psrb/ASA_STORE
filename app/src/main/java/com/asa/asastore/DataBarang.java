@@ -1,11 +1,14 @@
 package com.asa.asastore;
 
-public class Barang{
-    private String 	id_barang,id_merek,id_penjual,id_gambar,nama_barang,stok_barang,satuan_barang,harga_barang,tgl_harga_stok_barang,kode_barang,lokasi_barang,kategori_barang,deskripsi_barang,id_favorite;
+public class DataBarang{
+    private String 	id_barang,id_user,id_merek,id_penjual,id_gambar,nama_barang,stok_barang,satuan_barang,harga_barang,tgl_harga_stok_barang,kode_barang,lokasi_barang,kategori_barang,deskripsi_barang,id_favorite;
 
-    public Barang(){}
+    public DataBarang(){}
     public void setId_barang(String arg){
         this.id_barang = arg;
+    }
+    public void setId_user(String arg){
+        this.id_user = arg;
     }
     public void setId_merek(String arg){
         this.id_merek = arg;

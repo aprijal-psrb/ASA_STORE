@@ -48,8 +48,8 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
     public static AdapterHomeBarang adapterHomeBarang;
     public static AdapterShoppingSupplier adapterShoppingSupplier;
     public static AdapterFavoriteCategory adapterFavoriteCategory;
-    public static ArrayList<Barang> listBarang = new ArrayList<>();
-    public static Barang barang = new Barang();
+    public static List<DataBarang> listDataBarang = new ArrayList<>();
+    public static DataBarang dataBarang;
     //public static ArrayList<String> colorx = new ArrayList<>();
     public static HashMap<String,String> color = new HashMap<>();
     MyPagerAdapter mPagerAdapter;
@@ -241,14 +241,15 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
             List<NameValuePair> all = new ArrayList<>();
                 JSONObject jsonObject = jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-barang.php","GET",all);
             if(jsonObject == null){
-                return 0;
+                return 1;
             }
             try{
                 success = jsonObject.getInt("success");
                 if (success == 1){
                     JSONArray all_barang = jsonObject.getJSONArray("all_barang");
-                    allBarang.clear();
-                    listHomeBarang.clear();
+                    //allBarang.clear();
+                    //listHomeBarang.clear();
+                    listDataBarang.clear();
                     for(int n = 0; n < all_barang.length(); n++){
                         JSONObject c = all_barang.getJSONObject(n);
                         String id_barang = c.getString("id_barang");
@@ -266,6 +267,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                         String kategori_barang = c.getString("kategori_barang");
                         String deskripsi_barang = c.getString("deskripsi_barang");
                         String id_favorite = c.getString("id_favorite");
+                        /*
                         ArrayList<String> arrayList = new ArrayList<>();
                         arrayList.add(id_barang);
                         arrayList.add(id_user);
@@ -283,17 +285,28 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                         arrayList.add(deskripsi_barang);
                         arrayList.add(id_favorite);
                         allBarang.add(arrayList);
-                        barang = new Barang();
-                        barang.setId_favorite(id_favorite);
-                        barang.setNama_barang(nama_barang);
-                        barang.setHarga_barang(harga_barang);
-                        barang.setTgl_harga_stok_barang(tgl_harga_stok_barang);
-                        barang.setKategori_barang(kategori_barang);
-                        listBarang.add(barang);
-                        listHomeBarang.add(arrayList);
+                        */
+                        dataBarang = new DataBarang();
+                        dataBarang.setId_barang(id_barang);
+                        dataBarang.setId_user(id_user);
+                        dataBarang.setId_merek(id_merek);
+                        dataBarang.setId_penjual(id_penjual);
+                        dataBarang.setId_gambar(id_gambar);
+                        dataBarang.setNama_barang(nama_barang);
+                        dataBarang.setStok_barang(stok_barang);
+                        dataBarang.setSatuan_barang(satuan_barang);
+                        dataBarang.setHarga_barang(harga_barang);
+                        dataBarang.setTgl_harga_stok_barang(tgl_harga_stok_barang);
+                        dataBarang.setKode_barang(kode_barang);
+                        dataBarang.setLokasi_barang(lokasi_barang);
+                        dataBarang.setKategori_barang(kategori_barang);
+                        dataBarang.setDeskripsi_barang(deskripsi_barang);
+                        dataBarang.setId_favorite(id_favorite);
+                        listDataBarang.add(dataBarang);
+                        //listHomeBarang.add(arrayList);
                     }
                 }else {
-                    return 0;
+                    return 1;
                 }
             }catch (JSONException e){
                 e.printStackTrace();
@@ -330,7 +343,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                         listShoppingSupplier.add(arrayList);
                     }
                 }else{
-                    return 0;
+                    return 1;
                 }
             }catch (JSONException e){
                 e.printStackTrace();
@@ -339,7 +352,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
             all = new ArrayList<>();
             jsonObject = jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-favorite.php","GET",all);
             if(jsonObject == null){
-                return 0;
+                return 1;
             }
 
             try{
@@ -370,7 +383,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                         color.put(id_favorite,warna_favorite);
                     }
                 }else{
-                    return 0;
+                    return 1;
                 }
             }catch (JSONException e){
                 e.printStackTrace();
@@ -379,7 +392,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
             all = new ArrayList<>();
             jsonObject = jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-merek.php","GET",all);
             if(jsonObject == null){
-                return 0;
+                return 1;
             }
 
             try{
@@ -402,17 +415,17 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                         allMerek.add(arrayList);
                     }
                 }else{
-                    return 0;
+                    return 1;
                 }
             }catch (JSONException e){
                 e.printStackTrace();
             }
 
-            return success;
+            return 0;
         }
         @Override
         protected void onPostExecute(Integer arg){
-            if(arg == 0){
+            if(arg == 1){
                 AlertDialog.Builder dial = new AlertDialog.Builder(MainActivity.this);
                 dial.setMessage("Can't connect to server!").setNeutralButton("Retry",new DialogInterface.OnClickListener() {
                     @Override
@@ -426,7 +439,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                     }
                 }).show();
             }
-            if(arg == 1){
+            if(arg == 0){
 /*
                 Home.arrayListBarang = new ArrayList<>();
                 for (int i = 0; i < MainActivity.allBarang.size(); i++){
