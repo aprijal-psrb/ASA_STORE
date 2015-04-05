@@ -49,7 +49,9 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
     public static AdapterShoppingSupplier adapterShoppingSupplier;
     public static AdapterFavoriteCategory adapterFavoriteCategory;
     public static List<DataBarang> listDataBarang = new ArrayList<>();
-    public static DataBarang dataBarang;
+    public static List<DataSupplier> listDataSupplier = new ArrayList<>();
+    public static List<DataFavorite> listDataFavorite = new ArrayList<>();
+
     //public static ArrayList<String> colorx = new ArrayList<>();
     public static HashMap<String,String> color = new HashMap<>();
     MyPagerAdapter mPagerAdapter;
@@ -286,7 +288,8 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                         arrayList.add(id_favorite);
                         allBarang.add(arrayList);
                         */
-                        dataBarang = new DataBarang();
+                        //listHomeBarang.add(arrayList);
+                        DataBarang dataBarang = new DataBarang();
                         dataBarang.setId_barang(id_barang);
                         dataBarang.setId_user(id_user);
                         dataBarang.setId_merek(id_merek);
@@ -303,7 +306,6 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                         dataBarang.setDeskripsi_barang(deskripsi_barang);
                         dataBarang.setId_favorite(id_favorite);
                         listDataBarang.add(dataBarang);
-                        //listHomeBarang.add(arrayList);
                     }
                 }else {
                     return 1;
@@ -320,8 +322,9 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                 int success = jsonObject.getInt("success");
                 if (success == 1){
                     JSONArray penjual = jsonObject.getJSONArray("penjual");
-                    allPenjual.clear();
-                    listShoppingSupplier.clear();
+                    //allPenjual.clear();
+                    //listShoppingSupplier.clear();
+                    listDataSupplier.clear();
                     for(int n = 0; n < penjual.length(); n++){
                         JSONObject c = penjual.getJSONObject(n);
                         String id_penjual = c.getString("id_penjual");
@@ -331,6 +334,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                         String geolocation = c.getString("geolocation");
                         String kontak_toko = c.getString("kontak_toko");
                         String email_toko = c.getString("email_toko");
+                        /*
                         ArrayList<String> arrayList = new ArrayList<>();
                         arrayList.add(id_penjual);
                         arrayList.add(nama_penjual);
@@ -341,6 +345,16 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                         arrayList.add(email_toko);
                         allPenjual.add(arrayList);
                         listShoppingSupplier.add(arrayList);
+                        */
+                        DataSupplier dataSupplier = new DataSupplier();
+                        dataSupplier.setId_penjual(id_penjual);
+                        dataSupplier.setNama_penjual(nama_penjual);
+                        dataSupplier.setNama_toko(nama_toko);
+                        dataSupplier.setAlamat_toko(alamat_toko);
+                        dataSupplier.setGeolocation(geolocation);
+                        dataSupplier.setKontak_toko(kontak_toko);
+                        dataSupplier.setEmail_toko(email_toko);
+                        listDataSupplier.add(dataSupplier);
                     }
                 }else{
                     return 1;
@@ -358,17 +372,19 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
             try{
                 int success = jsonObject.getInt("success");
                 if (success == 1){
-                    JSONArray barang = jsonObject.getJSONArray("favorite");
-                    allFavorite.clear();
-                    listFavoriteCategory.clear();
+                    JSONArray favorite = jsonObject.getJSONArray("favorite");
+                    //allFavorite.clear();
+                    //listFavoriteCategory.clear();
                     //Favorite.listCategory = new ArrayList<>();
+                    listDataFavorite.clear();
                     color.clear();
-                    for(int n = 0; n < barang.length(); n++){
-                        JSONObject c = barang.getJSONObject(n);
+                    for(int n = 0; n < favorite.length(); n++){
+                        JSONObject c = favorite.getJSONObject(n);
                         String id_favorite = c.getString("id_favorite");
                         String warna_favorite = c.getString("warna_favorite");
                         String nama_favorite = c.getString("nama_favorite");
                         String deskripsi = c.getString("deskripsi");
+                        /*
                         ArrayList<String> arrayList = new ArrayList<>();
                         arrayList.add(id_favorite);
                         arrayList.add(warna_favorite);
@@ -381,6 +397,13 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                         //Favorite.listCategory.add(temp);
                         listFavoriteCategory.add(arrayList);
                         color.put(id_favorite,warna_favorite);
+                        */
+                        DataFavorite dataFavorite = new DataFavorite();
+                        dataFavorite.setId_favorite(id_favorite);
+                        dataFavorite.setWarna_favorite(warna_favorite);
+                        dataFavorite.setNama_favorite(nama_favorite);
+                        dataFavorite.setDeskripsi(deskripsi);
+                        listDataFavorite.add(dataFavorite);
                     }
                 }else{
                     return 1;
@@ -398,11 +421,11 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
             try{
                 int success = jsonObject.getInt("success");
                 if (success == 1){
-                    JSONArray barang = jsonObject.getJSONArray("merek");
+                    JSONArray merek = jsonObject.getJSONArray("merek");
                     allMerek.clear();
 
-                    for(int n = 0; n < barang.length(); n++){
-                        JSONObject c = barang.getJSONObject(n);
+                    for(int n = 0; n < merek.length(); n++){
+                        JSONObject c = merek.getJSONObject(n);
                         String id_merek = c.getString("id_merek");
                         String nama_merek = c.getString("nama_merek");
                         String logo_merek = c.getString("logo_merek");
