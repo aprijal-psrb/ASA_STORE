@@ -273,7 +273,7 @@ public class Favorite extends Fragment {
             ls.add(new BasicNameValuePair("id_favorite",params[0]));
             ls.add(new BasicNameValuePair("warna_favorite",params[1]));
             ls.add(new BasicNameValuePair("nama_favorite",params[2]));
-            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/update-favorite.php","POST",ls);
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/edit-favorite.php","POST",ls);
             if(json == null){
                 return null;
             }
