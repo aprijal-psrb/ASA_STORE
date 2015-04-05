@@ -13,6 +13,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+
 import org.apache.http.NameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,10 +27,15 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
     public static AdapterBarang adapterHomeBarang;
     public static AdapterShoppingSupplier adapterShoppingSupplier;
     public static AdapterFavoriteCategory adapterFavoriteCategory;
+    public static AdapterMerek adapterDataMerek;
+    public static ArrayAdapter adapterMerek;
+    public static ArrayAdapter adapterNamaToko;
     public static List<DataBarang> listDataBarang = new ArrayList<>();
     public static List<DataSupplier> listDataSupplier = new ArrayList<>();
     public static List<DataFavorite> listDataFavorite = new ArrayList<>();
     public static List<DataMerek> listDataMerek = new ArrayList<>();
+    public static List<String> listMerek = new ArrayList<>();
+    public static List<String> listNamaToko = new ArrayList<>();
     MyPagerAdapter mPagerAdapter;
     ViewPager mViewPager;
     ActionBar actionBar;
@@ -37,7 +44,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        new GetData().execute();
+        new GetData().execute(0);
         mPagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager)findViewById(R.id.pager);
         mViewPager.setAdapter(mPagerAdapter);
@@ -60,7 +67,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
         int id = item.getItemId();
         switch (id){
             case R.id.refresh:
-                new GetData().execute();
+                new GetData().execute(1);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -120,13 +127,15 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
         }
     }
 
-    public class GetData extends AsyncTask<String,Integer,Integer>{
+    public class GetData extends AsyncTask<Integer,Integer,Integer>{
+        private int TAG;
         @Override
         protected void onPreExecute(){
             super.onPreExecute();
         }
         @Override
-        protected Integer doInBackground(String... params) {
+        protected Integer doInBackground(Integer... params) {
+            TAG = params[0];
             List<NameValuePair> all = new ArrayList<>();
                 JSONObject jsonObject = jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-barang.php","GET",all);
             if(jsonObject == null){
@@ -205,6 +214,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                         dataSupplier.setKontak_toko(kontak_toko);
                         dataSupplier.setEmail_toko(email_toko);
                         listDataSupplier.add(dataSupplier);
+                        listNamaToko.add(nama_toko);
                     }
                 }else{
                     return 1;
@@ -263,6 +273,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                         dataMerek.setLogo_merek(logo_merek);
                         dataMerek.setDeskripsi_merek(deskripsi_merek);
                         listDataMerek.add(dataMerek);
+                        listMerek.add(nama_merek);
                     }
                 }else{
                     return 1;
@@ -279,7 +290,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                 dial.setMessage("Can't connect to server!").setNeutralButton("Retry",new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new GetData().execute();
+                        new GetData().execute(0);
                     }
                 }).setPositiveButton("OK",new DialogInterface.OnClickListener() {
                     @Override
@@ -289,11 +300,21 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                 }).show();
             }
             if(arg == 0){
-                adapterHomeBarang = new AdapterBarang(MainActivity.this,R.id.layout_item_home,listDataBarang);
-                Home.listViewBarang.setAdapter(adapterHomeBarang);
-                adapterShoppingSupplier = new AdapterShoppingSupplier(MainActivity.this,android.R.layout.simple_list_item_1,listDataSupplier);
-                Shopping.listViewSupplier.setAdapter(adapterShoppingSupplier);
-                adapterFavoriteCategory = new AdapterFavoriteCategory(MainActivity.this,R.layout.list_item_favorite_category,listDataFavorite);
+                if(TAG == 0) {
+                    adapterHomeBarang = new AdapterBarang(MainActivity.this, R.id.layout_item_home, listDataBarang);
+                    Home.listViewBarang.setAdapter(adapterHomeBarang);
+                    adapterShoppingSupplier = new AdapterShoppingSupplier(MainActivity.this, android.R.layout.simple_list_item_1, listDataSupplier);
+                    Shopping.listViewSupplier.setAdapter(adapterShoppingSupplier);
+                    adapterFavoriteCategory = new AdapterFavoriteCategory(MainActivity.this, R.layout.list_item_favorite_category, listDataFavorite);
+                    adapterDataMerek = new AdapterMerek(MainActivity.this,android.R.layout.simple_list_item_1,listDataMerek);
+                    adapterMerek = new ArrayAdapter(MainActivity.this,android.R.layout.simple_list_item_1,listMerek);
+                    adapterNamaToko = new ArrayAdapter(MainActivity.this,android.R.layout.simple_list_item_1,listNamaToko);
+
+                }else{
+                    adapterHomeBarang.notifyDataSetChanged();
+                    adapterShoppingSupplier.notifyDataSetChanged();
+                    adapterFavoriteCategory.notifyDataSetChanged();
+                }
             }
         }
     }
