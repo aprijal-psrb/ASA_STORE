@@ -1,7 +1,7 @@
 package com.asa.asastore;
 
 public class DataBarang{
-    private String 	id_barang,id_user,id_merek,id_penjual,id_gambar,nama_barang,stok_barang,satuan_barang,harga_barang,tgl_harga_stok_barang,kode_barang,lokasi_barang,kategori_barang,deskripsi_barang,id_favorite,merek_barang;
+    private String 	id_barang,id_user,id_merek,id_penjual,id_gambar,nama_barang,stok_barang,satuan_barang,harga_barang,tgl_harga_stok_barang,kode_barang,lokasi_barang,kategori_barang,deskripsi_barang,id_favorite,nama_merek;
     private int position;
 
     public DataBarang(){}
@@ -70,8 +70,8 @@ public class DataBarang{
         this.position = position;
     }
 
-    public void setMerek_barang(String merek){
-        this.merek_barang = merek;
+    public void setNama_merek(String merek){
+        this.nama_merek = merek;
     }
 
     public String getId_barang(){
@@ -83,6 +83,13 @@ public class DataBarang{
     }
 
     public String getId_merek(){
+        if(this.id_merek == null){
+            for(int x = 0; x < MainActivity.listDataMerek.size(); x++){
+                if(getNama_merek().equals(MainActivity.listDataMerek.get(x).getNama_merek())){
+                    return MainActivity.listDataMerek.get(x).getId_merek();
+                }
+            }
+        }
         return this.id_merek;
     }
 
@@ -138,10 +145,6 @@ public class DataBarang{
         return this.position;
     }
 
-    public String getMerek_barang(){
-        return this.merek_barang;
-    }
-
     public String getWarna_favorite(){
         for(int i = 0; i < MainActivity.listDataFavorite.size(); i++){
             if(getId_favorite().equals(MainActivity.listDataFavorite.get(i).getId_favorite())){
@@ -152,12 +155,14 @@ public class DataBarang{
     }
 
     public String getNama_merek(){
-        for (int i = 0; i < MainActivity.listDataMerek.size(); i++) {
-            if (getId_merek().equals(MainActivity.listDataMerek.get(i).getId_merek())) {
-                return MainActivity.listDataMerek.get(i).getNama_merek();
+        if(this.nama_merek == null){
+            for(int x = 0; x < MainActivity.listDataMerek.size(); x++){
+                if(getId_merek().equals(MainActivity.listDataMerek.get(x).getId_merek())){
+                    return MainActivity.listDataMerek.get(x).getNama_merek();
+                }
             }
         }
-        return null;
+        return this.nama_merek;
     }
 
     public String getNama_toko(){

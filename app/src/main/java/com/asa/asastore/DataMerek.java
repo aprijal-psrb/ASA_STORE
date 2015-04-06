@@ -37,13 +37,4 @@ public class DataMerek {
     public String getDeskripsi_merek(){
         return this.deskripsi_merek;
     }
-
-    public String getId_merekAtNama_merek(String nama_merek){
-        for(int x = 0; x < MainActivity.listDataMerek.size(); x++){
-            if(nama_merek.equals(MainActivity.listDataMerek.get(x).getNama_merek())){
-                return MainActivity.listDataMerek.get(x).getId_merek();
-            }
-        }
-        return null;
-    }
 }

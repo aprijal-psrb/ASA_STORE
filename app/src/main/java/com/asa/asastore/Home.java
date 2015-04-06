@@ -255,12 +255,12 @@ public class Home extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         DataBarang barang = new DataBarang();
                         barang.setNama_barang(nama.getText().toString());
-                        barang.setMerek_barang(merek.getText().toString());
+                        barang.setNama_merek(merek.getText().toString());
                         barang.setHarga_barang(harga.getText().toString());
                         barang.setStok_barang(jumlahBarang.getText().toString());
                         barang.setSatuan_barang(satuan.getText().toString());
                         barang.setKategori_barang(kategori.getSelectedItem().toString());
-                        barang.setId_penjual(penjual.getSelectedItem().toString());
+                        barang.setId_penjual(MainActivity.listDataSupplier.get(penjual.getSelectedItemPosition()).getId_penjual());
                         barang.setDeskripsi_barang(deskripsi.getText().toString());
                         new NewBarang().execute(barang);
                     }
@@ -380,19 +380,36 @@ public class Home extends Fragment {
         @Override
         protected Integer doInBackground(DataBarang... params) {
             barang = params[0];
-            String merek = barang.getMerek_barang();
-            //String id_merek = barang.getId
             List<NameValuePair> ls = new ArrayList<>();
+            String nama_merek = barang.getNama_merek();
+            String id_merek = barang.getId_merek();
+            if(id_merek == null){
+                List<NameValuePair> list = new ArrayList<>();
+                list.add(new BasicNameValuePair("nama_merek",nama_merek));
+                JSONObject jsonObject = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/add-merek.php","POST",list);
+
+            }else {
+                ls.add(new BasicNameValuePair("id_merek", id_merek));
+            }
+            ls.add(new BasicNameValuePair("id_penjual",barang.getId_penjual()));
             ls.add(new BasicNameValuePair("nama_barang",barang.getNama_barang()));
-            ls.add(new BasicNameValuePair("merek_barang",barang.getHarga_barang()));
+            ls.add(new BasicNameValuePair("harga_barang",barang.getHarga_barang()));
             ls.add(new BasicNameValuePair("stok_barang",barang.getStok_barang()));
+            ls.add(new BasicNameValuePair("satuan_barang",barang.getSatuan_barang()));
             ls.add(new BasicNameValuePair("kategori_barang",barang.getKategori_barang()));
             ls.add(new BasicNameValuePair("deskripsi_barang",barang.getDeskripsi_barang()));
-            //JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/edit-barang.php","POST",ls);
-            //if(json == null){
-            //    return 1;
-            //}
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/add-barang.php","POST",ls);
+            if(json == null){
+                return 1;
+            }
             return 0;
+        }
+        protected void onPostExecution(Integer arg){
+            if(arg == 0){
+                MainActivity.listDataBarang.add(barang);
+            }else{
+                Toast.makeText(getActivity(),"Error Occurred",Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
