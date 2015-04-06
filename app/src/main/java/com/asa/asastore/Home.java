@@ -262,6 +262,7 @@ public class Home extends Fragment {
                         barang.setKategori_barang(kategori.getSelectedItem().toString());
                         barang.setId_penjual(penjual.getSelectedItem().toString());
                         barang.setDeskripsi_barang(deskripsi.getText().toString());
+                        new NewBarang().execute(barang);
                     }
                 });
                 dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -378,9 +379,12 @@ public class Home extends Fragment {
         DataBarang barang;
         @Override
         protected Integer doInBackground(DataBarang... params) {
+            barang = params[0];
+            String merek = barang.getMerek_barang();
+            //String id_merek = barang.getId
             List<NameValuePair> ls = new ArrayList<>();
             ls.add(new BasicNameValuePair("nama_barang",barang.getNama_barang()));
-            ls.add(new BasicNameValuePair("harga_barang",barang.getHarga_barang()));
+            ls.add(new BasicNameValuePair("merek_barang",barang.getHarga_barang()));
             ls.add(new BasicNameValuePair("stok_barang",barang.getStok_barang()));
             ls.add(new BasicNameValuePair("kategori_barang",barang.getKategori_barang()));
             ls.add(new BasicNameValuePair("deskripsi_barang",barang.getDeskripsi_barang()));
