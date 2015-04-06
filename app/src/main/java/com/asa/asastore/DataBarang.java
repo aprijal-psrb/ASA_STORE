@@ -146,6 +146,9 @@ public class DataBarang{
     }
 
     public String getWarna_favorite(){
+        if(this.id_favorite == null){
+            return "#00000000";
+        }
         for(int i = 0; i < MainActivity.listDataFavorite.size(); i++){
             if(getId_favorite().equals(MainActivity.listDataFavorite.get(i).getId_favorite())){
                 return MainActivity.listDataFavorite.get(i).getWarna_favorite();
