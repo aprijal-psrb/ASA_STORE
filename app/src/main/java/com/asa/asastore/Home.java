@@ -387,6 +387,39 @@ public class Home extends Fragment {
                 List<NameValuePair> list = new ArrayList<>();
                 list.add(new BasicNameValuePair("nama_merek",nama_merek));
                 JSONObject jsonObject = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/add-merek.php","POST",list);
+                if(jsonObject == null){
+                    return 1;
+                }
+                List<NameValuePair> get = new ArrayList<>();
+                JSONObject objMerek = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-merek.php","GET",get);
+                if(objMerek == null){
+                    return 1;
+                }
+                try{
+                    int success = objMerek.getInt("success");
+                    if (success == 1){
+                        JSONArray merekArray = objMerek.getJSONArray("merek");
+                        for(int n = (merekArray.length()-1); n < merekArray.length(); n++){
+                            JSONObject c = merekArray.getJSONObject(n);
+                            String id_merekGet = c.getString("id_merek");
+                            String nama_merekGet = c.getString("nama_merek");
+                            String logo_merekGet = c.getString("logo_merek");
+                            String deskripsi_merekGet = c.getString("deskripsi_merek");
+                            DataMerek dataMerek = new DataMerek();
+                            dataMerek.setId_merek(id_merekGet);
+                            dataMerek.setNama_merek(nama_merekGet);
+                            dataMerek.setLogo_merek(logo_merekGet);
+                            dataMerek.setDeskripsi_merek(deskripsi_merekGet);
+                            MainActivity.listDataMerek.add(dataMerek);
+                            MainActivity.listMerek.add(nama_merekGet);
+                            Log.d("Perulangan Get Merek","============= "+"Ditambah "+nama_merek);
+                        }
+                    }else{
+                        return 1;
+                    }
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
 
             }else {
                 ls.add(new BasicNameValuePair("id_merek", id_merek));
@@ -404,9 +437,13 @@ public class Home extends Fragment {
             }
             return 0;
         }
-        protected void onPostExecution(Integer arg){
+        @Override
+        protected void onPostExecute(Integer arg){
             if(arg == 0){
                 MainActivity.listDataBarang.add(barang);
+                MainActivity.adapterHomeBarang.notifyDataSetChanged();
+                MainActivity.adapterMerek.notifyDataSetChanged();
+                MainActivity.adapterDataMerek.notifyDataSetChanged();
             }else{
                 Toast.makeText(getActivity(),"Error Occurred",Toast.LENGTH_SHORT).show();
             }
