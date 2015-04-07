@@ -1,39 +1,24 @@
 package com.asa.asastore;
 
-import android.accounts.NetworkErrorException;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.media.MediaActionSound;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Message;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.view.ActionMode;
-import android.view.ContextMenu;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.asa.ambilwarna.AmbilWarnaDialog;
+import yuku.ambilwarna.AmbilWarnaDialog;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
