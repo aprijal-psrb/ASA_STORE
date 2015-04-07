@@ -1,1 +1,1 @@
-include ':app', ':ambilwarnalibrary'
+include ':app'
