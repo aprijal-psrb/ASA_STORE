@@ -16,7 +16,10 @@ import android.net.NetworkRequest;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.format.Time;
+import android.text.style.TtsSpan;
 import android.util.Log;
+import android.util.TimeUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,6 +53,7 @@ import java.net.NetworkInterface;
 import java.nio.channels.ConnectionPendingException;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -412,6 +416,7 @@ public class Home extends Fragment {
                             dataMerek.setDeskripsi_merek(deskripsi_merekGet);
                             MainActivity.listDataMerek.add(dataMerek);
                             MainActivity.listMerek.add(nama_merekGet);
+                            ls.add(new BasicNameValuePair("id_merek",id_merekGet));
                             Log.d("Perulangan Get Merek","============= "+"Ditambah "+nama_merek);
                         }
                     }else{
@@ -424,9 +429,13 @@ public class Home extends Fragment {
             }else {
                 ls.add(new BasicNameValuePair("id_merek", id_merek));
             }
+            Time time = new Time(Time.getCurrentTimezone());
+            time.setToNow();
+            String date = time.format("%Y-%m-%d");
             ls.add(new BasicNameValuePair("id_penjual",barang.getId_penjual()));
             ls.add(new BasicNameValuePair("nama_barang",barang.getNama_barang()));
             ls.add(new BasicNameValuePair("harga_barang",barang.getHarga_barang()));
+            ls.add(new BasicNameValuePair("tgl_harga_stok_barang",date));
             ls.add(new BasicNameValuePair("stok_barang",barang.getStok_barang()));
             ls.add(new BasicNameValuePair("satuan_barang",barang.getSatuan_barang()));
             ls.add(new BasicNameValuePair("kategori_barang",barang.getKategori_barang()));
@@ -435,12 +444,61 @@ public class Home extends Fragment {
             if(json == null){
                 return 1;
             }
+            List<NameValuePair> get = new ArrayList<>();
+            JSONObject objBarang = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-barang.php","GET",get);
+            if(objBarang == null){
+                return 1;
+            }
+            try{
+                int success = objBarang.getInt("success");
+                if (success == 1){
+                    JSONArray barang = objBarang.getJSONArray("all_barang");
+                    for(int n = (barang.length()-1); n < barang.length(); n++){
+                        JSONObject c = barang.getJSONObject(n);
+                        String id_barang = c.getString("id_barang");
+                        String id_user = c.getString("id_user");
+                        String id_merekGet = c.getString("id_merek");
+                        String id_penjual = c.getString("id_penjual");
+                        String id_gambar = c.getString("id_gambar");
+                        String nama_barang = c.getString("nama_barang");
+                        String stok_barang = c.getString("stok_barang");
+                        String satuan_barang = c.getString("satuan_barang");
+                        String harga_barang = c.getString("harga_barang");
+                        String tgl_harga_stok_barang = c.getString("tgl_harga_stok_barang");
+                        String kode_barang = c.getString("kode_barang");
+                        String lokasi_barang = c.getString("lokasi_barang");
+                        String kategori_barang = c.getString("kategori_barang");
+                        String deskripsi_barang = c.getString("deskripsi_barang");
+                        String id_favorite = c.getString("id_favorite");
+                        DataBarang dataBarang = new DataBarang();
+                        dataBarang.setId_barang(id_barang);
+                        dataBarang.setId_user(id_user);
+                        dataBarang.setId_merek(id_merekGet);
+                        dataBarang.setId_penjual(id_penjual);
+                        dataBarang.setId_gambar(id_gambar);
+                        dataBarang.setNama_barang(nama_barang);
+                        dataBarang.setStok_barang(stok_barang);
+                        dataBarang.setSatuan_barang(satuan_barang);
+                        dataBarang.setHarga_barang(harga_barang);
+                        dataBarang.setTgl_harga_stok_barang(tgl_harga_stok_barang);
+                        dataBarang.setKode_barang(kode_barang);
+                        dataBarang.setLokasi_barang(lokasi_barang);
+                        dataBarang.setKategori_barang(kategori_barang);
+                        dataBarang.setDeskripsi_barang(deskripsi_barang);
+                        dataBarang.setId_favorite(id_favorite);
+                        MainActivity.listDataBarang.add(dataBarang);
+                    }
+                }else{
+                    return 1;
+                }
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
             return 0;
         }
         @Override
         protected void onPostExecute(Integer arg){
             if(arg == 0){
-                MainActivity.listDataBarang.add(barang);
                 MainActivity.adapterHomeBarang.notifyDataSetChanged();
                 MainActivity.adapterMerek.notifyDataSetChanged();
                 MainActivity.adapterDataMerek.notifyDataSetChanged();
