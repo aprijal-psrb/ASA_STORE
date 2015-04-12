@@ -245,12 +245,12 @@ public class Home extends Fragment {
                 listSatuan.add("Kotak");
                 listSatuan.add("Lusin");
                 listSatuan.add("Botol");
-                ArrayAdapter adapterSatuan = new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1,listSatuan);
+                ArrayAdapter adapterSatuan = new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_1,listSatuan);
                 satuan.setAdapter(adapterSatuan);
                 List<String> listKategori = new ArrayList<>();
                 listKategori.add("Elektronik");
                 listKategori.add("Automotif");
-                ArrayAdapter adapterKategory = new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1,listKategori);
+                ArrayAdapter adapterKategory = new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_1,listKategori);
                 kategori.setAdapter(adapterKategory);
                 penjual.setAdapter(MainActivity.adapterNamaToko);
                 dialog.setView(mView);
@@ -509,10 +509,59 @@ public class Home extends Fragment {
     }
 
     private class NewSupplier extends AsyncTask<DataSupplier,Void,Integer>{
-
+        DataSupplier dataSupplier;
         @Override
         protected Integer doInBackground(DataSupplier... params) {
-            return null;
+            dataSupplier = params[0];
+            List<NameValuePair> list = new ArrayList<>();
+            list.add(new BasicNameValuePair("nama_toko",dataSupplier.getNama_toko()));
+            list.add(new BasicNameValuePair("alamat_toko",dataSupplier.getAlamat_toko()));
+            list.add(new BasicNameValuePair("kontak_toko",dataSupplier.getKontak_toko()));
+            JSONObject object = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/add-penjual.php","POST",list);
+            if(object == null) return 1;
+            list.clear();
+            object = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-penjual.php","GET",list);
+            try{
+                int success = object.getInt("success");
+                if (success == 1){
+                    JSONArray penjual = object.getJSONArray("penjual");
+                    for(int n = (penjual.length()-1); n < penjual.length(); n++){
+                        JSONObject c = penjual.getJSONObject(n);
+                        String id_penjual = c.getString("id_penjual");
+                        String nama_penjual = c.getString("nama_penjual");
+                        String nama_toko = c.getString("nama_toko");
+                        String alamat_toko = c.getString("alamat_toko");
+                        String geolocation = c.getString("geolocation");
+                        String kontak_toko = c.getString("kontak_toko");
+                        String email_toko = c.getString("email_toko");
+                        DataSupplier dataSupplier = new DataSupplier();
+                        dataSupplier.setId_penjual(id_penjual);
+                        dataSupplier.setNama_penjual(nama_penjual);
+                        dataSupplier.setNama_toko(nama_toko);
+                        dataSupplier.setAlamat_toko(alamat_toko);
+                        dataSupplier.setGeolocation(geolocation);
+                        dataSupplier.setKontak_toko(kontak_toko);
+                        dataSupplier.setEmail_toko(email_toko);
+                        MainActivity.listDataSupplier.add(dataSupplier);
+                        MainActivity.listNamaToko.add(nama_toko);
+                    }
+                }else{
+                    return 1;
+                }
+            }catch (JSONException e){
+                e.printStackTrace();
+                return 1;
+            }
+            return 0;
+        }
+        @Override
+        protected void onPostExecute(Integer out){
+            if(out == 0){
+                MainActivity.adapterShoppingSupplier.notifyDataSetChanged();
+                MainActivity.adapterMerek.notifyDataSetChanged();
+            }else{
+                Toast.makeText(getActivity(),"Error Occurred!",Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }
