@@ -32,36 +32,16 @@
 
     <RelativeLayout
         android:id="@+id/content_pane"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="5"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:background="@android:color/background_light"
         android:orientation="vertical" >
-
-        <Button
-            android:id="@+id/btn_addShoppingItem"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginTop="@dimen/margin_8dp"
-            android:text="@string/btn_add" />
-
-        <Button
-            android:id="@+id/btn_cartStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="@dimen/margin_8dp"
-            android:layout_marginTop="@dimen/margin_8dp"
-            android:text="Selesai" />
 
         <ListView
             android:id="@+id/list_shopping"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/btn_addShoppingItem"
-            android:layout_marginTop="@dimen/margin_4dp" >
+            >
 
         </ListView>
     </RelativeLayout>
