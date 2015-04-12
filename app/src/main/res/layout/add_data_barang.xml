@@ -126,12 +126,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/lable_product_category" />
-
-        <Spinner
-            android:id="@+id/spinner_product_category"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
+        <LinearLayout
+            android:id="@+id/layout_category"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:orientation="horizontal" >
+            <Spinner
+                android:id="@+id/spinner_product_category"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+            <Button
+                android:id="@+id/btn_add_category"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="35dp"
+                android:layout_height="wrap_content"
+                android:text="Tambah"
+                android:layout_weight="0.20"
+                android:gravity="center" />
+        </LinearLayout>
         <TextView
             android:id="@+id/lbl_supplier"
             style="@style/lable_margin_style"

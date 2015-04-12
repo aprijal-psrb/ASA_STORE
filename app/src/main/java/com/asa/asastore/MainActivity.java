@@ -30,12 +30,15 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
     public static AdapterMerek adapterDataMerek;
     public static ArrayAdapter adapterMerek;
     public static ArrayAdapter adapterNamaToko;
+    public static ArrayAdapter adapterNamaKategori;
     public static List<DataBarang> listDataBarang = new ArrayList<>();
     public static List<DataSupplier> listDataSupplier = new ArrayList<>();
     public static List<DataFavorite> listDataFavorite = new ArrayList<>();
     public static List<DataMerek> listDataMerek = new ArrayList<>();
+    public static List<DataKategori> listDataKategori = new ArrayList<>();
     public static List<String> listMerek = new ArrayList<>();
     public static List<String> listNamaToko = new ArrayList<>();
+    public static List<String> listNamaKategori = new ArrayList<>();
     MyPagerAdapter mPagerAdapter;
     ViewPager mViewPager;
     ActionBar actionBar;
@@ -176,7 +179,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                         dataBarang.setTgl_harga_stok_barang(tgl_harga_stok_barang);
                         dataBarang.setKode_barang(kode_barang);
                         dataBarang.setLokasi_barang(lokasi_barang);
-                        dataBarang.setKategori_barang(kategori_barang);
+                        dataBarang.setId_kategori_barang(kategori_barang);
                         dataBarang.setDeskripsi_barang(deskripsi_barang);
                         dataBarang.setId_favorite(id_favorite);
                         listDataBarang.add(dataBarang);
@@ -281,6 +284,33 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
             }catch (JSONException e){
                 e.printStackTrace();
             }
+            all = new ArrayList<>();
+            jsonObject = jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-kategori.php","GET",all);
+            if(jsonObject == null){
+                return 1;
+            }
+            try{
+                int success = jsonObject.getInt("success");
+                if (success == 1){
+                    JSONArray kategori = jsonObject.getJSONArray("kategori");
+                    listDataKategori.clear();
+                    listNamaKategori.clear();
+                    for(int n = 0; n < kategori.length(); n++){
+                        JSONObject c = kategori.getJSONObject(n);
+                        String id = c.getString("id");
+                        String nama_kategori = c.getString("nama_kategori");
+                        DataKategori dataKategori = new DataKategori();
+                        dataKategori.setId_Kategori(id);
+                        dataKategori.setNama_Kategori(nama_kategori);
+                        listDataKategori.add(dataKategori);
+                        listNamaKategori.add(nama_kategori);
+                    }
+                }else{
+                    return 1;
+                }
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
             return 0;
         }
         @Override
@@ -307,9 +337,9 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                     Shopping.listViewSupplier.setAdapter(adapterShoppingSupplier);
                     adapterFavoriteCategory = new AdapterFavoriteCategory(MainActivity.this, R.layout.list_item_favorite_category, listDataFavorite);
                     adapterDataMerek = new AdapterMerek(MainActivity.this,android.R.layout.simple_list_item_1,listDataMerek);
-                    adapterMerek = new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_list_item_1,listMerek);
-                    adapterNamaToko = new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_list_item_1,listNamaToko);
-
+                    adapterMerek = new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_spinner_dropdown_item,listMerek);
+                    adapterNamaToko = new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_spinner_dropdown_item,listNamaToko);
+                    adapterNamaKategori = new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_spinner_dropdown_item,listNamaKategori);
                 }else{
                     adapterHomeBarang.notifyDataSetChanged();
                     adapterShoppingSupplier.notifyDataSetChanged();

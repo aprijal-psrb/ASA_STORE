@@ -40,13 +40,10 @@
             android:layout_marginTop="@dimen/margin_top_lbl"
             android:text="@string/lable_product_brand" />
 
-        <EditText
-            android:id="@+id/editText_product_brand"
+        <Spinner
+            android:id="@+id/spinner_product_brand"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/hint_product_brand"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            android:layout_height="wrap_content"/>
 
         <TextView
             android:id="@+id/lbl_product_price"
@@ -88,13 +85,10 @@
             android:layout_marginTop="@dimen/margin_top_lbl"
             android:text="@string/lable_product_category" />
 
-        <EditText
-            android:id="@+id/editText_product_category"
+        <Spinner
+            android:id="@+id/spinner_product_category"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Kategori Barang"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:inputType="textCapSentences" />
+            android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/lbl_supplier"
@@ -103,13 +97,10 @@
             android:layout_marginTop="@dimen/margin_top_lbl"
             android:text="@string/lable_supplier" />
 
-        <EditText
-            android:id="@+id/editText_product_supplier"
+        <Spinner
+            android:id="@+id/spinner_product_supplier"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="Penjual Barang"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:inputType="textCapSentences"/>
+            android:layout_height="wrap_content"/>
 
         <TextView
             android:id="@+id/lbl_product_description"

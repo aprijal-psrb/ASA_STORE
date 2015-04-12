@@ -94,7 +94,7 @@ public class Home extends Fragment {
                 final String stok = MainActivity.listDataBarang.get(position).getStok_barang();
                 String satuan = MainActivity.listDataBarang.get(position).getSatuan_barang();
                 tvNumUnit.setText(stok + " " + satuan);
-                tvCategory.setText(MainActivity.listDataBarang.get(position).getKategori_barang());
+                tvCategory.setText(MainActivity.listDataBarang.get(position).getNama_kategori_barang());
                 tvSupplier.setText(MainActivity.listDataBarang.get(position).getNama_toko());
                 tvDesc.setText(MainActivity.listDataBarang.get(position).getDeskripsi_barang());
                 builder.setNeutralButton("Edit", new DialogInterface.OnClickListener() {
@@ -103,18 +103,20 @@ public class Home extends Fragment {
                         AlertDialog.Builder edit = new AlertDialog.Builder(getActivity());
                         View mView = inflater.inflate(R.layout.edit_product_detail, null);
                         final EditText tvNameEdit = (EditText) mView.findViewById(R.id.editText_product_name);
-                        EditText tvBrandEdit = (EditText) mView.findViewById(R.id.editText_product_brand);
+                        final Spinner spinnerBrand = (Spinner) mView.findViewById(R.id.spinner_product_brand);
                         final EditText tvPriceEdit = (EditText) mView.findViewById(R.id.editText_product_price);
                         final EditText tvNumUnitEdit = (EditText) mView.findViewById(R.id.editText_product_num_unit);
-                        final EditText tvCategoryEdit = (EditText) mView.findViewById(R.id.editText_product_category);
-                        EditText tvSupplierEdit = (EditText) mView.findViewById(R.id.editText_product_supplier);
+                        final Spinner spinnerKategori = (Spinner) mView.findViewById(R.id.spinner_product_category);
+                        final Spinner spinnerPenjual = (Spinner) mView.findViewById(R.id.spinner_product_supplier);
                         final EditText tvDescEdit = (EditText) mView.findViewById(R.id.editText_product_description);
                         tvNameEdit.setText(tvName.getText().toString());
-                        tvBrandEdit.setText(tvBrand.getText().toString());
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),android.R.layout
+                                .simple_spinner_dropdown_item,MainActivity.listMerek);
+                        spinnerBrand.setAdapter(adapter);
                         tvPriceEdit.setText(price);
                         tvNumUnitEdit.setText(stok);
-                        tvCategoryEdit.setText(tvCategory.getText().toString());
-                        tvSupplierEdit.setText(tvSupplier.getText().toString());
+                        spinnerKategori.setAdapter(MainActivity.adapterNamaKategori);
+                        spinnerPenjual.setAdapter(MainActivity.adapterNamaToko);
                         tvDescEdit.setText(tvDesc.getText().toString());
                         edit.setView(mView);
                         edit.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -123,9 +125,12 @@ public class Home extends Fragment {
                                 DataBarang barang = new DataBarang();
                                 barang.setId_barang(MainActivity.listDataBarang.get(position).getId_barang());
                                 barang.setNama_barang(tvNameEdit.getText().toString());
+                                barang.setId_merek(MainActivity.listDataMerek.get(spinnerBrand.getSelectedItemPosition()).getId_merek());
                                 barang.setHarga_barang(tvPriceEdit.getText().toString());
                                 barang.setStok_barang(tvNumUnitEdit.getText().toString());
-                                barang.setKategori_barang(tvCategoryEdit.getText().toString());
+                                barang.setId_kategori_barang(MainActivity.listDataKategori.get(spinnerKategori.getSelectedItemPosition())
+                                        .getId_Kategori());
+                                barang.setId_penjual(MainActivity.listDataSupplier.get(spinnerPenjual.getSelectedItemPosition()).getId_penjual());
                                 barang.setDeskripsi_barang(tvDescEdit.getText().toString());
                                 barang.setPosition(position);
                                 new EditBarang().execute(barang);
@@ -176,7 +181,6 @@ public class Home extends Fragment {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         new DeleteData().execute(position);
-                                        MainActivity.listDataBarang.remove(position);
                                     }
                                 }).setNegativeButton("NO",new DialogInterface.OnClickListener() {
                                     @Override
@@ -209,6 +213,26 @@ public class Home extends Fragment {
                 final AutoCompleteTextView satuan = (AutoCompleteTextView) mView.findViewById(R.id.autoComp_product_unit);
                 final Spinner kategori = (Spinner) mView.findViewById(R.id.spinner_product_category);
                 final Spinner penjual = (Spinner) mView.findViewById(R.id.spinner_supplier);
+                final Button btnAddCategory = (Button) mView.findViewById(R.id.btn_add_category);
+                btnAddCategory.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        LayoutInflater inflater = getActivity().getLayoutInflater();
+                        View view = inflater.inflate(R.layout.dialog_category, null);
+                        final EditText newCateg = (EditText)view.findViewById(R.id.editTextCategory);
+                        builder.setTitle("Add Category");
+                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                new AddKategoriBarang().execute(newCateg.getText().toString());
+                            }
+                        });
+                        builder.setNegativeButton("Cancel", null);
+                        builder.setView(view);
+                        builder.show();
+                    }
+                });
                 final Button btnAddSupplier = (Button)mView.findViewById(R.id.btn_add_supplier);
                 final EditText deskripsi = (EditText) mView.findViewById(R.id.editText_product_description);
                 btnAddSupplier.setOnClickListener(new View.OnClickListener() {
@@ -245,13 +269,10 @@ public class Home extends Fragment {
                 listSatuan.add("Kotak");
                 listSatuan.add("Lusin");
                 listSatuan.add("Botol");
+                listSatuan.add("Buah");
                 ArrayAdapter adapterSatuan = new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_1,listSatuan);
                 satuan.setAdapter(adapterSatuan);
-                List<String> listKategori = new ArrayList<>();
-                listKategori.add("Elektronik");
-                listKategori.add("Automotif");
-                ArrayAdapter adapterKategory = new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_1,listKategori);
-                kategori.setAdapter(adapterKategory);
+                kategori.setAdapter(MainActivity.adapterNamaKategori);
                 penjual.setAdapter(MainActivity.adapterNamaToko);
                 dialog.setView(mView);
                 dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -263,7 +284,8 @@ public class Home extends Fragment {
                         barang.setHarga_barang(harga.getText().toString());
                         barang.setStok_barang(jumlahBarang.getText().toString());
                         barang.setSatuan_barang(satuan.getText().toString());
-                        barang.setKategori_barang(kategori.getSelectedItem().toString());
+                        barang.setId_kategori_barang(MainActivity.listDataKategori.get(kategori.getSelectedItemPosition()).getId_Kategori
+                                ());
                         barang.setId_penjual(MainActivity.listDataSupplier.get(penjual.getSelectedItemPosition()).getId_penjual());
                         barang.setDeskripsi_barang(deskripsi.getText().toString());
                         new NewBarang().execute(barang);
@@ -304,9 +326,11 @@ public class Home extends Fragment {
     }
 
     private class DeleteData extends AsyncTask<Integer, Void, Integer> {
+        int pos;
         @Override
         protected Integer doInBackground(Integer... params) {
-            String id_barang = MainActivity.listDataBarang.get(params[0]).getId_barang();
+            pos = params[0];
+            String id_barang = MainActivity.listDataBarang.get(pos).getId_barang();
             List<NameValuePair> ls = new ArrayList<>();
             ls.add(new BasicNameValuePair("id_barang", id_barang));
             JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/del-barang.php", "POST", ls);
@@ -318,6 +342,7 @@ public class Home extends Fragment {
         @Override
         public void onPostExecute(Integer arg){
             if(arg == 0) {
+                MainActivity.listDataBarang.remove(pos);
                 MainActivity.adapterHomeBarang.notifyDataSetChanged();
             }else{
                 Toast.makeText(getActivity(),"Error Occurred",Toast.LENGTH_SHORT).show();
@@ -354,9 +379,11 @@ public class Home extends Fragment {
             List<NameValuePair> ls = new ArrayList<>();
             ls.add(new BasicNameValuePair("id_barang",barang.getId_barang()));
             ls.add(new BasicNameValuePair("nama_barang",barang.getNama_barang()));
+            ls.add(new BasicNameValuePair("id_merek",barang.getId_merek()));
             ls.add(new BasicNameValuePair("harga_barang",barang.getHarga_barang()));
             ls.add(new BasicNameValuePair("stok_barang",barang.getStok_barang()));
-            ls.add(new BasicNameValuePair("kategori_barang",barang.getKategori_barang()));
+            ls.add(new BasicNameValuePair("kategori_barang",barang.getId_kategori_barang()));
+            ls.add(new BasicNameValuePair("id_penjual",barang.getId_penjual()));
             ls.add(new BasicNameValuePair("deskripsi_barang",barang.getDeskripsi_barang()));
             JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/edit-barang.php","POST",ls);
             if(json == null){
@@ -368,9 +395,11 @@ public class Home extends Fragment {
         protected void onPostExecute(Integer arg){
             if(arg == 0){
                 MainActivity.listDataBarang.get(barang.getPosition()).setNama_barang(barang.getNama_barang());
+                MainActivity.listDataBarang.get(barang.getPosition()).setId_merek(barang.getId_merek());
                 MainActivity.listDataBarang.get(barang.getPosition()).setHarga_barang(barang.getHarga_barang());
                 MainActivity.listDataBarang.get(barang.getPosition()).setStok_barang(barang.getStok_barang());
-                MainActivity.listDataBarang.get(barang.getPosition()).setKategori_barang(barang.getKategori_barang());
+                MainActivity.listDataBarang.get(barang.getPosition()).setId_kategori_barang(barang.getId_kategori_barang());
+                MainActivity.listDataBarang.get(barang.getPosition()).setId_penjual(barang.getId_penjual());
                 MainActivity.listDataBarang.get(barang.getPosition()).setDeskripsi_barang(barang.getDeskripsi_barang());
                 MainActivity.adapterHomeBarang.notifyDataSetChanged();
             }else{
@@ -416,7 +445,7 @@ public class Home extends Fragment {
                             dataMerek.setDeskripsi_merek(deskripsi_merekGet);
                             MainActivity.listDataMerek.add(dataMerek);
                             MainActivity.listMerek.add(nama_merekGet);
-                            ls.add(new BasicNameValuePair("id_merek",id_merekGet));
+                            ls.add(new BasicNameValuePair("id_merek", id_merekGet));
                         }
                     }else{
                         return 1;
@@ -437,7 +466,7 @@ public class Home extends Fragment {
             ls.add(new BasicNameValuePair("tgl_harga_stok_barang",date));
             ls.add(new BasicNameValuePair("stok_barang",barang.getStok_barang()));
             ls.add(new BasicNameValuePair("satuan_barang",barang.getSatuan_barang()));
-            ls.add(new BasicNameValuePair("kategori_barang",barang.getKategori_barang()));
+            ls.add(new BasicNameValuePair("kategori_barang",barang.getId_kategori_barang()));
             ls.add(new BasicNameValuePair("deskripsi_barang",barang.getDeskripsi_barang()));
             JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/add-barang.php","POST",ls);
             if(json == null){
@@ -482,7 +511,7 @@ public class Home extends Fragment {
                         dataBarang.setTgl_harga_stok_barang(tgl_harga_stok_barang);
                         dataBarang.setKode_barang(kode_barang);
                         dataBarang.setLokasi_barang(lokasi_barang);
-                        dataBarang.setKategori_barang(kategori_barang);
+                        dataBarang.setId_kategori_barang(kategori_barang);
                         dataBarang.setDeskripsi_barang(deskripsi_barang);
                         dataBarang.setId_favorite(id_favorite);
                         MainActivity.listDataBarang.add(dataBarang);
@@ -558,6 +587,50 @@ public class Home extends Fragment {
             if(out == 0){
                 MainActivity.adapterShoppingSupplier.notifyDataSetChanged();
                 MainActivity.adapterMerek.notifyDataSetChanged();
+            }else{
+                Toast.makeText(getActivity(),"Error Occurred!",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private class AddKategoriBarang extends AsyncTask<String,Void,Integer>{
+
+        @Override
+        protected Integer doInBackground(String... params) {
+            List<NameValuePair> list = new ArrayList<>();
+            Log.d("PARAMS[0]","================== "+params[0]);
+            list.add(new BasicNameValuePair("nama_kategori",params[0]));
+            JSONObject object = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/add-kategori.php","POST",list);
+            if(object == null) return 1;
+            list = new ArrayList<>();
+            object = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-kategori.php","GET",list);
+            if(object == null){
+                return 1;
+            }
+            try{
+                int success = object.getInt("success");
+                if (success == 1){
+                    JSONArray kategori = object.getJSONArray("kategori");
+                        JSONObject c = kategori.getJSONObject(kategori.length()-1);
+                        String id = c.getString("id");
+                        String nama_kategori = c.getString("nama_kategori");
+                        DataKategori dataKategori = new DataKategori();
+                        dataKategori.setId_Kategori(id);
+                        dataKategori.setNama_Kategori(nama_kategori);
+                        MainActivity.listDataKategori.add(dataKategori);
+                        MainActivity.listNamaKategori.add(nama_kategori);
+                }else{
+                    return 1;
+                }
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+            return 0;
+        }
+        @Override
+        protected void onPostExecute(Integer out){
+            if(out == 0){
+                MainActivity.adapterNamaKategori.notifyDataSetChanged();
             }else{
                 Toast.makeText(getActivity(),"Error Occurred!",Toast.LENGTH_SHORT).show();
             }

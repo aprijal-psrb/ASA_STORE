@@ -1,7 +1,8 @@
 package com.asa.asastore;
 
 public class DataBarang{
-    private String 	id_barang,id_user,id_merek,id_penjual,id_gambar,nama_barang,stok_barang,satuan_barang,harga_barang,tgl_harga_stok_barang,kode_barang,lokasi_barang,kategori_barang,deskripsi_barang,id_favorite,nama_merek;
+    private String 	id_barang,id_user,id_merek,id_penjual,id_gambar,nama_barang,stok_barang,satuan_barang,harga_barang,
+            tgl_harga_stok_barang,kode_barang,lokasi_barang,id_kategori_barang,deskripsi_barang,id_favorite,nama_merek;
     private int position;
 
     public DataBarang(){}
@@ -54,8 +55,8 @@ public class DataBarang{
         this.lokasi_barang = lokasi_barang;
     }
 
-    public void setKategori_barang(String kategori_barang){
-        this.kategori_barang = kategori_barang;
+    public void setId_kategori_barang(String kategori_barang){
+        this.id_kategori_barang = kategori_barang;
     }
 
     public void setDeskripsi_barang(String deskripsi_barang){
@@ -129,8 +130,17 @@ public class DataBarang{
         return this.lokasi_barang;
     }
 
-    public String getKategori_barang(){
-        return this.kategori_barang;
+    public String getId_kategori_barang(){
+        return this.id_kategori_barang;
+    }
+
+    public String getNama_kategori_barang(){
+        for(int i = 0; i < MainActivity.listDataKategori.size(); i++){
+            if(this.id_kategori_barang.equals(MainActivity.listDataKategori.get(i).getId_Kategori())){
+                return MainActivity.listDataKategori.get(i).getNama_Kategori();
+            }
+        }
+        return null;
     }
 
     public String getDeskripsi_barang(){

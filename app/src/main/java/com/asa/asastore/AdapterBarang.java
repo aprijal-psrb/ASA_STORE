@@ -39,7 +39,7 @@ public class AdapterBarang extends ArrayAdapter<DataBarang> {
             productName.setText(dataBarang.getNama_barang());
             productPrice.setText("Rp "+dataBarang.getHarga_barang());
             productDate.setText(dataBarang.getTgl_harga_stok_barang());
-            productCategory.setText(dataBarang.getKategori_barang());
+            productCategory.setText(dataBarang.getNama_kategori_barang());
             imageView.setBackgroundColor(Color.parseColor(dataBarang.getWarna_favorite()));
         }
         return view;
