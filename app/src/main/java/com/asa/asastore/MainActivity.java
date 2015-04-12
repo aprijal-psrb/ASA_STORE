@@ -186,8 +186,6 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                 }
             }catch (JSONException e){
                 e.printStackTrace();
-            }catch (NullPointerException e){
-                e.printStackTrace();
             }
             all = new ArrayList<>();
             jsonObject = jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-penjual.php","GET",all);
@@ -196,6 +194,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                 if (success == 1){
                     JSONArray penjual = jsonObject.getJSONArray("penjual");
                     listDataSupplier.clear();
+                    listNamaToko.clear();
                     for(int n = 0; n < penjual.length(); n++){
                         JSONObject c = penjual.getJSONObject(n);
                         String id_penjual = c.getString("id_penjual");
@@ -261,6 +260,7 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                 if (success == 1){
                     JSONArray merek = jsonObject.getJSONArray("merek");
                     listDataMerek.clear();
+                    listMerek.clear();
                     for(int n = 0; n < merek.length(); n++){
                         JSONObject c = merek.getJSONObject(n);
                         String id_merek = c.getString("id_merek");
@@ -307,8 +307,8 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
                     Shopping.listViewSupplier.setAdapter(adapterShoppingSupplier);
                     adapterFavoriteCategory = new AdapterFavoriteCategory(MainActivity.this, R.layout.list_item_favorite_category, listDataFavorite);
                     adapterDataMerek = new AdapterMerek(MainActivity.this,android.R.layout.simple_list_item_1,listDataMerek);
-                    adapterMerek = new ArrayAdapter(MainActivity.this,android.R.layout.simple_list_item_1,listMerek);
-                    adapterNamaToko = new ArrayAdapter(MainActivity.this,android.R.layout.simple_list_item_1,listNamaToko);
+                    adapterMerek = new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_list_item_1,listMerek);
+                    adapterNamaToko = new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_list_item_1,listNamaToko);
 
                 }else{
                     adapterHomeBarang.notifyDataSetChanged();
