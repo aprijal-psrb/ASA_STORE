@@ -17,7 +17,7 @@ if(isset($_POST['nama_barang'])){
 	$kategori_barang = $_POST['kategori_barang'];
 	$deskripsi_barang = $_POST['deskripsi_barang'];
 	$id_favorite = $_POST['id_favorite'];
-	$result = mysql_query("INSERT INTO barang(id_merek,nama_barang,harga_barang,stok_barang,satuan_barang,kategori_barang,id_penjual,deskripsi_barang) VALUES ('$id_merek','$nama_barang','$harga_barang','$stok_barang','$satuan_barang','$kategori_barang','$id_penjual','$deskripsi_barang')");
+	$result = mysql_query("INSERT INTO barang(id_merek,nama_barang,harga_barang,stok_barang,satuan_barang,kategori_barang,id_penjual,deskripsi_barang,tgl_harga_stok_barang) VALUES ('$id_merek','$nama_barang','$harga_barang','$stok_barang','$satuan_barang','$kategori_barang','$id_penjual','$deskripsi_barang','$tgl_harga_stok_barang')");
 	if($result){
 		$response["success"] = 1;
 		$response["message"] = "Barang added.";
