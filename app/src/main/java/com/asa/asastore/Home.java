@@ -417,7 +417,6 @@ public class Home extends Fragment {
                             MainActivity.listDataMerek.add(dataMerek);
                             MainActivity.listMerek.add(nama_merekGet);
                             ls.add(new BasicNameValuePair("id_merek",id_merekGet));
-                            Log.d("Perulangan Get Merek","============= "+"Ditambah "+nama_merek);
                         }
                     }else{
                         return 1;
