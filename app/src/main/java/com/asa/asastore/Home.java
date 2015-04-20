@@ -164,16 +164,14 @@ public class Home extends Fragment {
                                     public void onClick(DialogInterface dialog, int which) {
                                         String id_favorite = MainActivity.listDataFavorite.get(which).getId_favorite();
                                         String id_barang = MainActivity.listDataBarang.get(position).getId_barang();
-                                        new SetFavorite().execute(id_favorite, id_barang);
-                                        MainActivity.listDataBarang.get(position).setId_favorite(id_favorite);
+                                        new SetFavorite().execute(id_favorite, id_barang, ""+position);
                                     }
                                 });
                                 builder.show();
                                 return true;
                             case R.id.clearFavorite:
                                 String id_barang = MainActivity.listDataBarang.get(position).getId_barang();
-                                MainActivity.listDataBarang.get(position).setId_favorite("");
-                                new ClearFavorite().execute(id_barang);
+                                new ClearFavorite().execute(id_barang,""+position);
                                 return true;
                             case R.id.deleteHome:
                                 AlertDialog.Builder dia = new AlertDialog.Builder(getActivity());
@@ -304,12 +302,16 @@ public class Home extends Fragment {
     }
 
     private class SetFavorite extends AsyncTask<String, Void, Integer> {
+    	int position;
+    	String id_favorite;
         @Override
         protected Integer doInBackground(String... arg) {
+        	position = Integer.valueOf(arg[2]);
+        	id_favorite = arg[0];
             List<NameValuePair> ls = new ArrayList<>();
-            ls.add(new BasicNameValuePair("id_favorite", arg[0]));
+            ls.add(new BasicNameValuePair("id_favorite", id_favorite));
             ls.add(new BasicNameValuePair("id_barang", arg[1]));
-            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/set-favorite.php", "POST", ls);
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"set-favorite.php", "POST", ls);
             if(json == null){
                 return 1;
             }
@@ -318,6 +320,7 @@ public class Home extends Fragment {
         @Override
         public void onPostExecute(Integer arg){
             if(arg == 0) {
+                MainActivity.listDataBarang.get(position).setId_favorite(id_favorite);
                 MainActivity.adapterHomeBarang.notifyDataSetChanged();
             }else{
                 Toast.makeText(getActivity(),"Error Occurred",Toast.LENGTH_SHORT).show();
@@ -333,7 +336,7 @@ public class Home extends Fragment {
             String id_barang = MainActivity.listDataBarang.get(pos).getId_barang();
             List<NameValuePair> ls = new ArrayList<>();
             ls.add(new BasicNameValuePair("id_barang", id_barang));
-            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/del-barang.php", "POST", ls);
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"del-barang.php", "POST", ls);
             if(json == null){
                 return 1;
             }
@@ -351,11 +354,13 @@ public class Home extends Fragment {
     }
 
     private class ClearFavorite extends AsyncTask<String,Void,Integer> {
+    	int position;
         @Override
         protected Integer doInBackground(String... params) {
+        	position = Integer.valueOf(params[1]);
             List<NameValuePair> ls = new ArrayList<>();
             ls.add(new BasicNameValuePair("id_barang",params[0]));
-            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/clear-favorite.php", "POST", ls);
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"clear-favorite.php", "POST", ls);
             if(json == null){
                 return 1;
             }
@@ -364,6 +369,7 @@ public class Home extends Fragment {
         @Override
         public void onPostExecute(Integer arg){
             if(arg == 0) {
+                MainActivity.listDataBarang.get(position).setId_favorite("");
                 MainActivity.adapterHomeBarang.notifyDataSetChanged();
             }else{
                 Toast.makeText(getActivity(),"Error Occurred",Toast.LENGTH_SHORT).show();
@@ -385,7 +391,7 @@ public class Home extends Fragment {
             ls.add(new BasicNameValuePair("kategori_barang",barang.getId_kategori_barang()));
             ls.add(new BasicNameValuePair("id_penjual",barang.getId_penjual()));
             ls.add(new BasicNameValuePair("deskripsi_barang",barang.getDeskripsi_barang()));
-            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/edit-barang.php","POST",ls);
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"edit-barang.php","POST",ls);
             if(json == null){
                 return 1;
             }
@@ -419,12 +425,12 @@ public class Home extends Fragment {
             if(id_merek == null){
                 List<NameValuePair> list = new ArrayList<>();
                 list.add(new BasicNameValuePair("nama_merek",nama_merek));
-                JSONObject jsonObject = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/add-merek.php","POST",list);
+                JSONObject jsonObject = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"add-merek.php","POST",list);
                 if(jsonObject == null){
                     return 1;
                 }
                 List<NameValuePair> get = new ArrayList<>();
-                JSONObject objMerek = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-merek.php","GET",get);
+                JSONObject objMerek = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"get-merek.php","GET",get);
                 if(objMerek == null){
                     return 1;
                 }
@@ -468,12 +474,12 @@ public class Home extends Fragment {
             ls.add(new BasicNameValuePair("satuan_barang",barang.getSatuan_barang()));
             ls.add(new BasicNameValuePair("kategori_barang",barang.getId_kategori_barang()));
             ls.add(new BasicNameValuePair("deskripsi_barang",barang.getDeskripsi_barang()));
-            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/add-barang.php","POST",ls);
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"add-barang.php","POST",ls);
             if(json == null){
                 return 1;
             }
             List<NameValuePair> get = new ArrayList<>();
-            JSONObject objBarang = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-barang.php","GET",get);
+            JSONObject objBarang = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"get-barang.php","GET",get);
             if(objBarang == null){
                 return 1;
             }
@@ -545,10 +551,10 @@ public class Home extends Fragment {
             list.add(new BasicNameValuePair("nama_toko",dataSupplier.getNama_toko()));
             list.add(new BasicNameValuePair("alamat_toko",dataSupplier.getAlamat_toko()));
             list.add(new BasicNameValuePair("kontak_toko",dataSupplier.getKontak_toko()));
-            JSONObject object = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/add-penjual.php","POST",list);
+            JSONObject object = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"add-penjual.php","POST",list);
             if(object == null) return 1;
             list.clear();
-            object = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-penjual.php","GET",list);
+            object = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"get-penjual.php","GET",list);
             try{
                 int success = object.getInt("success");
                 if (success == 1){
@@ -598,12 +604,11 @@ public class Home extends Fragment {
         @Override
         protected Integer doInBackground(String... params) {
             List<NameValuePair> list = new ArrayList<>();
-            Log.d("PARAMS[0]","================== "+params[0]);
             list.add(new BasicNameValuePair("nama_kategori",params[0]));
-            JSONObject object = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/add-kategori.php","POST",list);
+            JSONObject object = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"add-kategori.php","POST",list);
             if(object == null) return 1;
             list = new ArrayList<>();
-            object = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-kategori.php","GET",list);
+            object = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"get-kategori.php","GET",list);
             if(object == null){
                 return 1;
             }

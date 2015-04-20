@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
-
 import yuku.ambilwarna.AmbilWarnaDialog;
 
 import org.apache.http.NameValuePair;
@@ -184,12 +183,12 @@ public class Favorite extends Fragment {
             List<NameValuePair> post = new ArrayList<>();
             post.add(new BasicNameValuePair("warna_favorite",color));
             post.add(new BasicNameValuePair("nama_favorite",nama_favorite));
-            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/add-favorite_category.php","POST",post);
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"add-favorite_category.php","POST",post);
             if(json == null){
                 return 1;
             }
             List<NameValuePair> get = new ArrayList<>();
-            JSONObject jsonObject = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/get-favorite.php","GET",get);
+            JSONObject jsonObject = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"get-favorite.php","GET",get);
             if(jsonObject == null){
                 return 1;
             }
@@ -234,7 +233,7 @@ public class Favorite extends Fragment {
             String id_favorite = MainActivity.listDataFavorite.get(params[0]).getId_favorite();
             List<NameValuePair> ls = new ArrayList<>();
             ls.add(new BasicNameValuePair("id_favorite",id_favorite));
-            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/del-favorite_category.php","POST",ls);
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"del-favorite_category.php","POST",ls);
                 if(json == null){
                     return null;
                 }
@@ -258,7 +257,7 @@ public class Favorite extends Fragment {
             ls.add(new BasicNameValuePair("id_favorite",params[0]));
             ls.add(new BasicNameValuePair("warna_favorite",params[1]));
             ls.add(new BasicNameValuePair("nama_favorite",params[2]));
-            JSONObject json = MainActivity.jsonParser.makeHttpRequest("http://192.168.173.1/asa/asastore/edit-favorite.php","POST",ls);
+            JSONObject json = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"edit-favorite.php","POST",ls);
             if(json == null){
                 return null;
             }
