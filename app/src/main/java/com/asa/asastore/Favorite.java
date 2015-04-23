@@ -180,7 +180,8 @@ public class Favorite extends Fragment {
         protected Integer doInBackground(String... arg) {
             String color = arg[0];
             String nama_favorite = arg[1];
-            List<NameValuePair> post = new ArrayList<>();
+            @SuppressWarnings("deprecation")
+			List<NameValuePair> post = new ArrayList<>();
             post.add(new BasicNameValuePair("warna_favorite",color));
             post.add(new BasicNameValuePair("nama_favorite",nama_favorite));
             JSONObject json = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"add-favorite_category.php","POST",post);
