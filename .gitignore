@@ -1,5 +1,6 @@
 /.idea/workspace.xml
-/.idea/libraries
+.idea/libraries/support_annotations_22_0_0.xml
+.idea/libraries/support_v4_22_0_0.xml
 .DS_Store
 
 # Built application files
