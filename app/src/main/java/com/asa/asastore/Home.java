@@ -37,6 +37,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.NameValuePair;
 import org.apache.http.conn.ConnectTimeoutException;
@@ -54,7 +60,9 @@ import java.nio.channels.ConnectionPendingException;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by APRIJAL_PASARIBU on 30/03/2015.
@@ -133,7 +141,7 @@ public class Home extends Fragment {
                                 barang.setId_penjual(MainActivity.listDataSupplier.get(spinnerPenjual.getSelectedItemPosition()).getId_penjual());
                                 barang.setDeskripsi_barang(tvDescEdit.getText().toString());
                                 barang.setPosition(position);
-                                new EditBarang().execute(barang);
+                                editBarang(barang);
                             }
                         });
                         edit.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -164,21 +172,21 @@ public class Home extends Fragment {
                                     public void onClick(DialogInterface dialog, int which) {
                                         String id_favorite = MainActivity.listDataFavorite.get(which).getId_favorite();
                                         String id_barang = MainActivity.listDataBarang.get(position).getId_barang();
-                                        new SetFavorite().execute(id_favorite, id_barang, ""+position);
+                                        setFavorite(id_favorite, id_barang, position);
                                     }
                                 });
                                 builder.show();
                                 return true;
                             case R.id.clearFavorite:
                                 String id_barang = MainActivity.listDataBarang.get(position).getId_barang();
-                                new ClearFavorite().execute(id_barang,""+position);
+                                clearFavorite(id_barang, position);
                                 return true;
                             case R.id.deleteHome:
                                 AlertDialog.Builder dia = new AlertDialog.Builder(getActivity());
                                 dia.setMessage("Are you sure!!!").setPositiveButton("YES",new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        new DeleteData().execute(position);
+                                        deleteData(position);
                                     }
                                 }).setNegativeButton("NO",new DialogInterface.OnClickListener() {
                                     @Override
@@ -223,7 +231,7 @@ public class Home extends Fragment {
                         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                new AddKategoriBarang().execute(newCateg.getText().toString());
+                                addKategoriBarang(newCateg.getText().toString());
                             }
                         });
                         builder.setNegativeButton("Cancel", null);
@@ -301,56 +309,114 @@ public class Home extends Fragment {
         return rootView;
     }
 
-    private class SetFavorite extends AsyncTask<String, Void, Integer> {
-    	int position;
-    	String id_favorite;
-        @Override
-        protected Integer doInBackground(String... arg) {
-        	position = Integer.valueOf(arg[2]);
-        	id_favorite = arg[0];
-            List<NameValuePair> ls = new ArrayList<>();
-            ls.add(new BasicNameValuePair("id_favorite", id_favorite));
-            ls.add(new BasicNameValuePair("id_barang", arg[1]));
-            JSONObject json = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"set-favorite.php", "POST", ls);
-            if(json == null){
-                return 1;
+    public void setFavorite(final String id_favorite, final String id_barang, final int position){
+
+        // Parameter untuk Method.POST
+        Map<String, String> param = new HashMap<>();
+        param.put("id_favorite", id_favorite);
+        param.put("id_barang", id_barang);
+
+        // permintaan set favorite
+        MyJsonObjectRequest requestSetFavorite = new MyJsonObjectRequest(Request.Method.POST,
+                MainActivity.URL+"set-favorite.php",
+                param,
+                new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    int success = response.getInt("success");
+                    if(success == 1) {
+                        MainActivity.listDataBarang.get(position).setId_favorite(id_favorite);
+                        MainActivity.adapterHomeBarang.notifyDataSetChanged();
+                    }else{
+                        Toast.makeText(getActivity(), "Error Occurred", Toast.LENGTH_LONG).show();
+                    }
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
             }
-            return 0;
-        }
-        @Override
-        public void onPostExecute(Integer arg){
-            if(arg == 0) {
-                MainActivity.listDataBarang.get(position).setId_favorite(id_favorite);
-                MainActivity.adapterHomeBarang.notifyDataSetChanged();
-            }else{
-                Toast.makeText(getActivity(),"Error Occurred",Toast.LENGTH_SHORT).show();
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
             }
-        }
+        });
+
+        // Menambah daftar request ke jaringan
+        AppController.getInstance().addToRequestQueue(requestSetFavorite, "set-favorite");
     }
 
-    private class DeleteData extends AsyncTask<Integer, Void, Integer> {
-        int pos;
-        @Override
-        protected Integer doInBackground(Integer... params) {
-            pos = params[0];
-            String id_barang = MainActivity.listDataBarang.get(pos).getId_barang();
-            List<NameValuePair> ls = new ArrayList<>();
-            ls.add(new BasicNameValuePair("id_barang", id_barang));
-            JSONObject json = MainActivity.jsonParser.makeHttpRequest(MainActivity.URL+"del-barang.php", "POST", ls);
-            if(json == null){
-                return 1;
-            }
-            return 0;
-        }
-        @Override
-        public void onPostExecute(Integer arg){
-            if(arg == 0) {
-                MainActivity.listDataBarang.remove(pos);
-                MainActivity.adapterHomeBarang.notifyDataSetChanged();
-            }else{
-                Toast.makeText(getActivity(),"Error Occurred",Toast.LENGTH_SHORT).show();
-            }
-        }
+    private void deleteData(final int position){
+
+        // parameter untuk Method.POST
+        Map<String, String> param = new HashMap<>();
+        param.put("id_barang", MainActivity.listDataBarang.get(position).getId_barang());
+
+        // permintaan menghapus data
+        MyJsonObjectRequest request = new MyJsonObjectRequest(Request.Method.POST, MainActivity.URL + "del-barang.php",
+                param,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            int success = response.getInt("success");
+                            if(success == 1) {
+                                MainActivity.listDataBarang.remove(position);
+                                MainActivity.adapterHomeBarang.notifyDataSetChanged();
+                            }else{
+                                Toast.makeText(getActivity(), "Error Occurred", Toast.LENGTH_LONG).show();
+                            }
+                        }catch (JSONException e){
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
+                    }
+                });
+
+        // Menambahkan daftar request ke jaringan
+        AppController.getInstance().addToRequestQueue(request, "del-barang");
+    }
+
+    private void clearFavorite(String id_barang, final int position){
+
+        // Parameter untuk Method.POST
+        Map<String, String> param = new HashMap<>();
+        param.put("id_barang", id_barang);
+
+        // Request yang akan dilakukan
+        MyJsonObjectRequest request = new MyJsonObjectRequest(Request.Method.POST, MainActivity.URL + "clear-favorite",
+                param,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            int success = response.getInt("success");
+                            if(success == 1) {
+                                MainActivity.listDataBarang.remove(position);
+                                MainActivity.adapterHomeBarang.notifyDataSetChanged();
+                                Toast.makeText(getActivity(), response.getString("message"), Toast.LENGTH_SHORT).show();
+                            }else{
+                                Toast.makeText(getActivity(), "Error Occurred", Toast.LENGTH_LONG).show();
+                            }
+                        }catch (JSONException e){
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
+                    }
+                });
+
+        // Melakukan Request ke jaringan
+        AppController.getInstance().addToRequestQueue(request, "clear-favorite");
     }
 
     private class ClearFavorite extends AsyncTask<String,Void,Integer> {
@@ -375,6 +441,56 @@ public class Home extends Fragment {
                 Toast.makeText(getActivity(),"Error Occurred",Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void editBarang(final DataBarang dataBarang){
+
+        // Parameter untuk di kirim ke jaringan
+        Map<String, String> param = new HashMap<>();
+        param.put("id_barang", dataBarang.getId_barang());
+        param.put("nama_barang", dataBarang.getNama_barang());
+        param.put("id_merek", dataBarang.getId_merek());
+        param.put("harga_barang", dataBarang.getHarga_barang());
+        param.put("stok_barang", dataBarang.getStok_barang());
+        param.put("kategori_barang", dataBarang.getId_kategori_barang());
+        param.put("id_penjual", dataBarang.getId_penjual());
+        param.put("deskripsi_barang", dataBarang.getDeskripsi_barang());
+
+        // Request untuk yang akan dilakukan
+        MyJsonObjectRequest request = new MyJsonObjectRequest(Request.Method.POST, MainActivity.URL + "edit-barang.php",
+                param,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            int success = response.getInt("success");
+                            if(success == 1) {
+                                MainActivity.listDataBarang.get(dataBarang.getPosition()).setNama_barang(dataBarang.getNama_barang());
+                                MainActivity.listDataBarang.get(dataBarang.getPosition()).setId_merek(dataBarang.getId_merek());
+                                MainActivity.listDataBarang.get(dataBarang.getPosition()).setHarga_barang(dataBarang.getHarga_barang());
+                                MainActivity.listDataBarang.get(dataBarang.getPosition()).setStok_barang(dataBarang.getStok_barang());
+                                MainActivity.listDataBarang.get(dataBarang.getPosition()).setId_kategori_barang(dataBarang.getId_kategori_barang());
+                                MainActivity.listDataBarang.get(dataBarang.getPosition()).setId_penjual(dataBarang.getId_penjual());
+                                MainActivity.listDataBarang.get(dataBarang.getPosition()).setDeskripsi_barang(dataBarang.getDeskripsi_barang());
+                                MainActivity.adapterHomeBarang.notifyDataSetChanged();
+                                Toast.makeText(getActivity(), response.getString("message"), Toast.LENGTH_SHORT).show();
+                            }else{
+                                Toast.makeText(getActivity(), "Error Occurred", Toast.LENGTH_LONG).show();
+                            }
+                        }catch (JSONException e){
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                });
+
+        // Melakukan request ke jaringan
+        AppController.getInstance().addToRequestQueue(request, "edit-barang");
     }
 
     private class EditBarang extends AsyncTask<DataBarang,Void,Integer>{
@@ -597,6 +713,80 @@ public class Home extends Fragment {
                 Toast.makeText(getActivity(),"Error Occurred!",Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void addKategoriBarang(String nama_kategori){
+
+        // Parameter untuk request jaringan
+        Map<String, String> param = new HashMap<>();
+        param.put("nama_kategori", nama_kategori);
+
+        // Request yang akan dilakukan
+        MyJsonObjectRequest request = new MyJsonObjectRequest(Request.Method.POST, MainActivity.URL + "add-kategori.php",
+                param,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            int success = response.getInt("success");
+                            if(success == 1) {
+                                getKategori();
+                            }else{
+                                Toast.makeText(getActivity(), "Error Occurred", Toast.LENGTH_LONG).show();
+                            }
+                        }catch (JSONException e){
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // Melakukan request jaringan
+        AppController.getInstance().addToRequestQueue(request, "add-kategori");
+    }
+
+    private void getKategori(){
+
+        // Request yang akan dilakukan
+        MyJsonObjectRequest request = new MyJsonObjectRequest(MainActivity.URL + "get-kategori.php", null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try{
+                            int success = response.getInt("success");
+                            if (success == 1){
+                                JSONArray kategori = response.getJSONArray("kategori");
+                                JSONObject c = kategori.getJSONObject(kategori.length()-1);
+                                String id = c.getString("id");
+                                String nama_kategori = c.getString("nama_kategori");
+                                DataKategori dataKategori = new DataKategori();
+                                dataKategori.setId_Kategori(id);
+                                dataKategori.setNama_Kategori(nama_kategori);
+                                MainActivity.listDataKategori.add(dataKategori);
+                                MainActivity.listNamaKategori.add(nama_kategori);
+                            }else{
+                                Toast.makeText(getActivity(), "Error Occurred", Toast.LENGTH_LONG).show();
+                            }
+                        }catch (JSONException e){
+                            e.printStackTrace();
+                        }
+                        MainActivity.adapterNamaKategori.notifyDataSetChanged();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
+                    }
+                });
+
+        // Melakukan request ke jaringan
+        AppController.getInstance().addToRequestQueue(request, "get-kategori");
     }
 
     private class AddKategoriBarang extends AsyncTask<String,Void,Integer>{
