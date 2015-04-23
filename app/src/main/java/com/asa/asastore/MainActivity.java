@@ -1,43 +1,39 @@
 package com.asa.asastore;
 
 import android.app.ActionBar;
-import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.InputFilter.LengthFilter;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
-import org.apache.http.NameValuePair;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.android.volley.Request.Method;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class MainActivity extends FragmentActivity implements ViewPager.OnPageChangeListener,ActionBar.TabListener{
-	public static String URL = "http://192.168.137.1/asa/asastore/";
+public class MainActivity extends FragmentActivity{
+
+    // Sesuaikan dengan IP localhost.
+	public static String URL = "http://192.168.173.1/asa/asastore/";
+
     public static JSONParser jsonParser = new JSONParser();
     public static AdapterBarang adapterHomeBarang;
     public static AdapterShoppingSupplier adapterShoppingSupplier;
@@ -56,30 +52,120 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
     public static List<String> listNamaKategori = new ArrayList<>();
     public static SharedPreferences savedData;
     public static SharedPreferences.Editor savedDataEditor;
+
+    ProgressDialog pDialog;
     MyPagerAdapter mPagerAdapter;
     ViewPager mViewPager;
     ActionBar actionBar;
-    ProgressDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        pDialog = new ProgressDialog(this);
+        pDialog = new ProgressDialog(MainActivity.this);
         pDialog.setCancelable(false);
-        //new GetData().execute(0);
-        getData();
+        savedData = getApplicationContext().getSharedPreferences("savedData", MODE_PRIVATE);
+
+        // Pengaturan Tab dan SwipeTab
         mPagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager)findViewById(R.id.pager);
         mViewPager.setAdapter(mPagerAdapter);
-        mViewPager.setOnPageChangeListener(this);
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {getActionBar().setSelectedNavigationItem(position);}});
         actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        actionBar.addTab(actionBar.newTab().setIcon(R.drawable.home_status).setTabListener(this));
-        actionBar.addTab(actionBar.newTab().setIcon(R.drawable.belanja_status).setTabListener(this));
-        actionBar.addTab(actionBar.newTab().setIcon(R.drawable.favorite_status).setTabListener(this));
-        savedData = getApplicationContext().getSharedPreferences("savedData", MODE_PRIVATE);
-        savedDataEditor = savedData.edit();
+        ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+            @Override
+            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+                mViewPager.setCurrentItem(tab.getPosition());
+            }
+            @Override
+            public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {}
+            @Override
+            public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {}
+        };
+        actionBar.addTab(actionBar.newTab().setIcon(R.drawable.home_status).setTabListener(tabListener));
+        actionBar.addTab(actionBar.newTab().setIcon(R.drawable.belanja_status).setTabListener(tabListener));
+        actionBar.addTab(actionBar.newTab().setIcon(R.drawable.favorite_status).setTabListener(tabListener));
+
+        // Mengambil data dengan ketentuan :
+        if(isNetworkConnected()) {
+            getOnlineData(); // Ketika Online (selain mobile network karena belum langsung ke internet)
+        }else{
+            Toast.makeText(getApplicationContext(),"Tidak Terhubung Dengan Jaringan",Toast.LENGTH_LONG).show();
+            getOfflineData(); // Mengambil data private prefences
+        }
+    }
+
+    public void getOnlineData(){
+    	pDialog.setMessage("Get Data, Please wait...");
+    	pDialog.show();
+
+        // Permintaan Jaringan
+    	JsonObjectRequest jsonRequest = new JsonObjectRequest(Method.GET, URL+"get-all_data.php", null, new Response.Listener<JSONObject>() {
+    		@Override
+    		public void onResponse(JSONObject jsonObject){
+
+                // Menyimpan data ke private Prefences
+                savedDataEditor = savedData.edit();
+                savedDataEditor.putString("all_data", jsonObject.toString());
+                savedDataEditor.apply();
+
+                // Mengisi tiap list
+    			JSONParser.parse(jsonObject.toString());
+
+                // Meng set List
+                adapterHomeBarang = new AdapterBarang(MainActivity.this, R.id.layout_item_home, listDataBarang);
+                Home.listViewBarang.setAdapter(adapterHomeBarang);
+                adapterShoppingSupplier = new AdapterShoppingSupplier(MainActivity.this, android.R.layout.simple_list_item_1, listDataSupplier);
+                Shopping.listViewSupplier.setAdapter(adapterShoppingSupplier);
+                adapterFavoriteCategory = new AdapterFavoriteCategory(MainActivity.this, R.layout.list_item_favorite_category, listDataFavorite);
+                adapterDataMerek = new AdapterMerek(MainActivity.this,android.R.layout.simple_list_item_1, listDataMerek);
+                adapterMerek = new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_spinner_dropdown_item, listMerek);
+                adapterNamaToko = new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_spinner_dropdown_item, listNamaToko);
+                adapterNamaKategori = new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_spinner_dropdown_item, listNamaKategori);
+                pDialog.dismiss();
+
+    		}}, new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError arg0) {
+				Toast.makeText(getApplicationContext(),arg0.toString(),Toast.LENGTH_LONG).show();
+				pDialog.dismiss();
+			}
+		});
+
+        // Permintaan Dilakukan
+    	AppController.getInstance().addToRequestQueue(jsonRequest, "get-all_barang");
+    }
+
+    public void getOfflineData(){
+        String json = savedData.getString("all_data", null);
+        if(json == null)return;
+
+        // Mengisi tiap list
+        JSONParser.parse(json);
+
+        // Meng set List
+        adapterHomeBarang = new AdapterBarang(MainActivity.this, R.id.layout_item_home, listDataBarang);
+        adapterShoppingSupplier = new AdapterShoppingSupplier(MainActivity.this, android.R.layout.simple_list_item_1, listDataSupplier);
+        adapterFavoriteCategory = new AdapterFavoriteCategory(MainActivity.this, R.layout.list_item_favorite_category, listDataFavorite);
+        adapterDataMerek = new AdapterMerek(MainActivity.this,android.R.layout.simple_list_item_1, listDataMerek);
+        adapterMerek = new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_spinner_dropdown_item, listMerek);
+        adapterNamaToko = new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_spinner_dropdown_item, listNamaToko);
+        adapterNamaKategori = new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_spinner_dropdown_item, listNamaKategori);
+    }
+
+    public boolean isNetworkConnected(){
+        ConnectivityManager conMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mobile = conMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+        // Apakah jaringan tersedia selain jaringan mobile (karena webserver belum di internet)
+        if(conMgr.getActiveNetworkInfo() != null && !mobile.isConnected()){
+            return true;
+        }else {
+            return false;
+        }
     }
 
     @Override
@@ -93,219 +179,9 @@ public class MainActivity extends FragmentActivity implements ViewPager.OnPageCh
         int id = item.getItemId();
         switch (id){
             case R.id.refresh:
-                //new GetData().execute(1);
+                getOnlineData();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
-
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-        getActionBar().setSelectedNavigationItem(position);
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-    }
-
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-        mViewPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-    }
-
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-    }
-
-    public class MyPagerAdapter extends FragmentStatePagerAdapter {
-        public MyPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-        @Override
-        public Fragment getItem(int i) {
-            switch (i){
-                case 0:
-                    return new Home();
-                case 1:
-                    return new Shopping();
-                case 2:
-                    return new Favorite();
-            }
-            return null;
-        }
-
-        @Override
-        public int getCount() {
-            return 3;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return "OBJECT " + (position + 1);
-        }
-    }
-
-    public void getData(){
-    	pDialog.setMessage("Get Data, Please wait...");
-    	pDialog.show();
-    	JsonObjectRequest jsonRequest = new JsonObjectRequest(Method.GET, URL+"get-all_data.php", null, new Response.Listener<JSONObject>() {
-    		@Override
-    		public void onResponse(JSONObject jsonObject){
-    			Log.d("jsonObject", jsonObject.toString());
-    			try{
-                    int success = jsonObject.getInt("success");
-                    if (success == 1){
-                        JSONArray all_barang = jsonObject.getJSONArray("all_barang");
-                        savedDataEditor.putString("all_barang", all_barang.toString());
-                        savedDataEditor.apply();
-                        listDataBarang.clear();
-                        for(int n = 0; n < all_barang.length(); n++){
-                            JSONObject c = all_barang.getJSONObject(n);
-                            String id_barang = c.getString("id_barang");
-                            String id_user = c.getString("id_user");
-                            String id_merek = c.getString("id_merek");
-                            String id_penjual = c.getString("id_penjual");
-                            String id_gambar = c.getString("id_gambar");
-                            String nama_barang = c.getString("nama_barang");
-                            String stok_barang = c.getString("stok_barang");
-                            String satuan_barang = c.getString("satuan_barang");
-                            String harga_barang = c.getString("harga_barang");
-                            String tgl_harga_stok_barang = c.getString("tgl_harga_stok_barang");
-                            String kode_barang = c.getString("kode_barang");
-                            String lokasi_barang = c.getString("lokasi_barang");
-                            String kategori_barang = c.getString("kategori_barang");
-                            String deskripsi_barang = c.getString("deskripsi_barang");
-                            String id_favorite = c.getString("id_favorite");
-                            DataBarang dataBarang = new DataBarang();
-                            dataBarang.setId_barang(id_barang);
-                            dataBarang.setId_user(id_user);
-                            dataBarang.setId_merek(id_merek);
-                            dataBarang.setId_penjual(id_penjual);
-                            dataBarang.setId_gambar(id_gambar);
-                            dataBarang.setNama_barang(nama_barang);
-                            dataBarang.setStok_barang(stok_barang);
-                            dataBarang.setSatuan_barang(satuan_barang);
-                            dataBarang.setHarga_barang(harga_barang);
-                            dataBarang.setTgl_harga_stok_barang(tgl_harga_stok_barang);
-                            dataBarang.setKode_barang(kode_barang);
-                            dataBarang.setLokasi_barang(lokasi_barang);
-                            dataBarang.setId_kategori_barang(kategori_barang);
-                            dataBarang.setDeskripsi_barang(deskripsi_barang);
-                            dataBarang.setId_favorite(id_favorite);
-                            listDataBarang.add(dataBarang);
-                        }
-                        
-                        JSONArray penjual = jsonObject.getJSONArray("penjual");
-                        savedDataEditor.putString("penjual", penjual.toString());
-                        savedDataEditor.apply();
-                        listDataSupplier.clear();
-                        listNamaToko.clear();
-                        for(int n = 0; n < penjual.length(); n++){
-                            JSONObject c = penjual.getJSONObject(n);
-                            String id_penjual = c.getString("id_penjual");
-                            String nama_penjual = c.getString("nama_penjual");
-                            String nama_toko = c.getString("nama_toko");
-                            String alamat_toko = c.getString("alamat_toko");
-                            String geolocation = c.getString("geolocation");
-                            String kontak_toko = c.getString("kontak_toko");
-                            String email_toko = c.getString("email_toko");
-                            DataSupplier dataSupplier = new DataSupplier();
-                            dataSupplier.setId_penjual(id_penjual);
-                            dataSupplier.setNama_penjual(nama_penjual);
-                            dataSupplier.setNama_toko(nama_toko);
-                            dataSupplier.setAlamat_toko(alamat_toko);
-                            dataSupplier.setGeolocation(geolocation);
-                            dataSupplier.setKontak_toko(kontak_toko);
-                            dataSupplier.setEmail_toko(email_toko);
-                            listDataSupplier.add(dataSupplier);
-                            listNamaToko.add(nama_toko);
-                        }
-                        
-                        JSONArray favorite = jsonObject.getJSONArray("favorite");
-                        savedDataEditor.putString("favorite", favorite.toString());
-                        savedDataEditor.apply();
-                        listDataFavorite.clear();
-                        for(int n = 0; n < favorite.length(); n++){
-                            JSONObject c = favorite.getJSONObject(n);
-                            String id_favorite = c.getString("id_favorite");
-                            String warna_favorite = c.getString("warna_favorite");
-                            String nama_favorite = c.getString("nama_favorite");
-                            String deskripsi = c.getString("deskripsi");
-                            DataFavorite dataFavorite = new DataFavorite();
-                            dataFavorite.setId_favorite(id_favorite);
-                            dataFavorite.setWarna_favorite(warna_favorite);
-                            dataFavorite.setNama_favorite(nama_favorite);
-                            dataFavorite.setDeskripsi(deskripsi);
-                            listDataFavorite.add(dataFavorite);
-                        }
-                        
-                        JSONArray merek = jsonObject.getJSONArray("merek");
-                        savedDataEditor.putString("merek", merek.toString());
-                        savedDataEditor.apply();
-                        listDataMerek.clear();
-                        listMerek.clear();
-                        for(int n = 0; n < merek.length(); n++){
-                            JSONObject c = merek.getJSONObject(n);
-                            String id_merek = c.getString("id_merek");
-                            String nama_merek = c.getString("nama_merek");
-                            String logo_merek = c.getString("logo_merek");
-                            String deskripsi_merek = c.getString("deskripsi_merek");
-                            DataMerek dataMerek = new DataMerek();
-                            dataMerek.setId_merek(id_merek);
-                            dataMerek.setNama_merek(nama_merek);
-                            dataMerek.setLogo_merek(logo_merek);
-                            dataMerek.setDeskripsi_merek(deskripsi_merek);
-                            listDataMerek.add(dataMerek);
-                            listMerek.add(nama_merek);
-                        }
-                        
-                        JSONArray kategori = jsonObject.getJSONArray("kategori");
-                        savedDataEditor.putString("kategori", kategori.toString());
-                        savedDataEditor.apply();
-                        listDataKategori.clear();
-                        listNamaKategori.clear();
-                        for(int n = 0; n < kategori.length(); n++){
-                            JSONObject c = kategori.getJSONObject(n);
-                            String id = c.getString("id");
-                            String nama_kategori = c.getString("nama_kategori");
-                            DataKategori dataKategori = new DataKategori();
-                            dataKategori.setId_Kategori(id);
-                            dataKategori.setNama_Kategori(nama_kategori);
-                            listDataKategori.add(dataKategori);
-                            listNamaKategori.add(nama_kategori);
-                        }
-                    }
-                }catch (JSONException e){
-                    e.printStackTrace();
-                }
-                adapterHomeBarang = new AdapterBarang(MainActivity.this, R.id.layout_item_home, listDataBarang);
-                Home.listViewBarang.setAdapter(adapterHomeBarang);
-                adapterShoppingSupplier = new AdapterShoppingSupplier(MainActivity.this, android.R.layout.simple_list_item_1, listDataSupplier);
-                Shopping.listViewSupplier.setAdapter(adapterShoppingSupplier);
-                adapterFavoriteCategory = new AdapterFavoriteCategory(MainActivity.this, R.layout.list_item_favorite_category, listDataFavorite);
-                adapterDataMerek = new AdapterMerek(MainActivity.this,android.R.layout.simple_list_item_1,listDataMerek);
-                adapterMerek = new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_spinner_dropdown_item,listMerek);
-                adapterNamaToko = new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_spinner_dropdown_item,listNamaToko);
-                adapterNamaKategori = new ArrayAdapter<>(MainActivity.this,android.R.layout.simple_spinner_dropdown_item,listNamaKategori);
-                pDialog.dismiss();
-    		}
-		}, new Response.ErrorListener() {
-
-			@Override
-			public void onErrorResponse(VolleyError arg0) {
-				Log.e("VolleyError", arg0.toString());
-				pDialog.dismiss();
-			}
-		});
-    	AppController.getInstance().addToRequestQueue(jsonRequest, "get-all_barang");
-    }
 }
-
