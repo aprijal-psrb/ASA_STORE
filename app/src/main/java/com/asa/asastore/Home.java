@@ -658,6 +658,54 @@ public class Home extends Fragment {
         }
     }
 
+    private void newSupplier(DataSupplier dataSupplier){
+
+        // parameter post jaringan
+        Map<String, String> param = new HashMap<>();
+        param.put("nama_toko", dataSupplier.getNama_toko());
+        param.put("alamat_toko", dataSupplier.getAlamat_toko());
+        param.put("kontak_toko", dataSupplier.getKontak_toko());
+
+        // Request yang akan dilakukan
+        MyJsonObjectRequest request = new MyJsonObjectRequest(MainActivity.URL + "add-penjual.php",
+                param,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void getSupplier(){
+
+        // Request
+        MyJsonObjectRequest request = new MyJsonObjectRequest(MainActivity.URL + "get-penjual.php",
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                });
+
+        // Melakukan request jaringan
+        AppController.getInstance().addToRequestQueue(request, "get-penjual");
+
+    }
+
     private class NewSupplier extends AsyncTask<DataSupplier,Void,Integer>{
         DataSupplier dataSupplier;
         @Override
