@@ -419,6 +419,7 @@ public class Home extends Fragment {
         AppController.getInstance().addToRequestQueue(request, "clear-favorite");
     }
 
+    /* data backup
     private class ClearFavorite extends AsyncTask<String,Void,Integer> {
     	int position;
         @Override
@@ -442,6 +443,7 @@ public class Home extends Fragment {
             }
         }
     }
+    */
 
     private void editBarang(final DataBarang dataBarang){
 
@@ -493,6 +495,7 @@ public class Home extends Fragment {
         AppController.getInstance().addToRequestQueue(request, "edit-barang");
     }
 
+    /* data backup
     private class EditBarang extends AsyncTask<DataBarang,Void,Integer>{
         DataBarang barang = new DataBarang();
         @Override
@@ -529,6 +532,7 @@ public class Home extends Fragment {
             }
         }
     }
+    */
 
     private class NewBarang extends AsyncTask<DataBarang,Void,Integer>{
         DataBarang barang;
@@ -750,6 +754,7 @@ public class Home extends Fragment {
 
     }
 
+    /* data backup
     private class NewSupplier extends AsyncTask<DataSupplier,Void,Integer>{
         DataSupplier dataSupplier;
         @Override
@@ -806,6 +811,7 @@ public class Home extends Fragment {
             }
         }
     }
+    */
 
     private void addKategoriBarang(String nama_kategori){
 
@@ -881,6 +887,7 @@ public class Home extends Fragment {
         AppController.getInstance().addToRequestQueue(request, "get-kategori");
     }
 
+    /* data backup
     private class AddKategoriBarang extends AsyncTask<String,Void,Integer>{
 
         @Override
@@ -923,4 +930,5 @@ public class Home extends Fragment {
             }
         }
     }
+    */
 }
