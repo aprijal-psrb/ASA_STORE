@@ -257,7 +257,7 @@ public class Home extends Fragment {
                                 supplier.setNama_toko(namaToko.getText().toString());
                                 supplier.setAlamat_toko(alamatToko.getText().toString());
                                 supplier.setKontak_toko(kontakToko.getText().toString());
-                                new NewSupplier().execute(supplier);
+                                newSupplier(supplier);
                             }
                         });
                         tambahDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -672,7 +672,16 @@ public class Home extends Fragment {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-
+                        try {
+                            int success = response.getInt("success");
+                            if(success == 1) {
+                                getSupplier();
+                            }else{
+                                Toast.makeText(getActivity(), "Error Occurred", Toast.LENGTH_LONG).show();
+                            }
+                        }catch (JSONException e){
+                            e.printStackTrace();
+                        }
                     }
                 },
                 new Response.ErrorListener() {
@@ -681,6 +690,10 @@ public class Home extends Fragment {
                         Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
                     }
                 });
+
+        // Melakukan request jaringan
+        AppController.getInstance().addToRequestQueue(request, "add-penjual");
+
     }
 
     private void getSupplier(){
@@ -691,13 +704,44 @@ public class Home extends Fragment {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-
+                        try{
+                            int success = response.getInt("success");
+                            if (success == 1){
+                                JSONArray penjual = response.getJSONArray("penjual");
+                                for(int n = (penjual.length()-1); n < penjual.length(); n++){
+                                    JSONObject c = penjual.getJSONObject(n);
+                                    String id_penjual = c.getString("id_penjual");
+                                    String nama_penjual = c.getString("nama_penjual");
+                                    String nama_toko = c.getString("nama_toko");
+                                    String alamat_toko = c.getString("alamat_toko");
+                                    String geolocation = c.getString("geolocation");
+                                    String kontak_toko = c.getString("kontak_toko");
+                                    String email_toko = c.getString("email_toko");
+                                    DataSupplier dataSupplier = new DataSupplier();
+                                    dataSupplier.setId_penjual(id_penjual);
+                                    dataSupplier.setNama_penjual(nama_penjual);
+                                    dataSupplier.setNama_toko(nama_toko);
+                                    dataSupplier.setAlamat_toko(alamat_toko);
+                                    dataSupplier.setGeolocation(geolocation);
+                                    dataSupplier.setKontak_toko(kontak_toko);
+                                    dataSupplier.setEmail_toko(email_toko);
+                                    MainActivity.listDataSupplier.add(dataSupplier);
+                                    MainActivity.listNamaToko.add(nama_toko);
+                                }
+                            }else{
+                                Toast.makeText(getActivity(), "Error Occurred", Toast.LENGTH_LONG).show();
+                            }
+                        }catch (JSONException e){
+                            e.printStackTrace();
+                        }
+                        MainActivity.adapterShoppingSupplier.notifyDataSetChanged();
+                        MainActivity.adapterNamaToko.notifyDataSetChanged();
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
+                        Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
                     }
                 });
 
