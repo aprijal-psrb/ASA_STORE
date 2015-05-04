@@ -1,12 +1,10 @@
 <component name="libraryTable">
   <library name="AmbilWarnaLib-">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/AmbilWarnaLib/classes.jar!/" />
       <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/AmbilWarnaLib/res" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/AmbilWarnaLib/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="jar://$PROJECT_DIR$/AmbilWarnaLib-src.zip!/ambilwarnalibrary/src/main/java" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>

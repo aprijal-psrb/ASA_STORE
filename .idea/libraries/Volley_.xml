@@ -5,8 +5,6 @@
       <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/Volley/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="jar://$PROJECT_DIR$/Volley-src.zip!/Volley/src/main/java" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>
