@@ -1,10 +1,13 @@
 <component name="libraryTable">
   <library name="Volley-">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/Volley/res" />
       <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/Volley/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/Volley/res" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/Volley-src.zip!/Volley/src/main/java" />
+      <root url="jar://$PROJECT_DIR$/Volley-src.zip!/Volley/src/main/java" />
+    </SOURCES>
   </library>
 </component>
