@@ -11,7 +11,7 @@ android {
     signingConfigs {
     }
     compileSdkVersion 21
-    buildToolsVersion '22.0.1'
+    buildToolsVersion '21.1.2'
     defaultConfig {
         applicationId "com.asa.asastore"
         minSdkVersion 15
@@ -33,7 +33,7 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:support-v4:22.0.0'
+    compile 'com.android.support:support-v4:21.0.3'
     compile ':AmbilWarnaLib@aar'
 	compile ':Volley@aar'
 }
