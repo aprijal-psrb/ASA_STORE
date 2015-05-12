@@ -32,7 +32,7 @@ import java.util.List;
 public class MainActivity extends FragmentActivity{
 
     // Sesuaikan dengan IP localhost.
-	public static String URL = "http://192.168.173.1/asa/asastore/";
+	public static String URL = "http://uskkb19679a2.sukurlah.koding.io/asa/asastore/";
 
     public static JSONParser jsonParser = new JSONParser();
     public static AdapterBarang adapterHomeBarang;
@@ -63,7 +63,7 @@ public class MainActivity extends FragmentActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         pDialog = new ProgressDialog(MainActivity.this);
-        pDialog.setCancelable(false);
+        pDialog.setCancelable(true);
         savedData = getApplicationContext().getSharedPreferences("savedData", MODE_PRIVATE);
 
         // Pengaturan Tab dan SwipeTab
@@ -94,7 +94,9 @@ public class MainActivity extends FragmentActivity{
             getOnlineData(); // Ketika Online (selain mobile network karena belum langsung ke internet)
         }else{
             Toast.makeText(getApplicationContext(),"Tidak Terhubung Dengan Jaringan",Toast.LENGTH_LONG).show();
-            getOfflineData(); // Mengambil data private prefences
+            //getOfflineData(); // Mengambil data private prefences
+
+            getOnlineData();
         }
     }
 
@@ -129,8 +131,10 @@ public class MainActivity extends FragmentActivity{
 
     		}}, new Response.ErrorListener() {
 			@Override
-			public void onErrorResponse(VolleyError arg0) {
-				Toast.makeText(getApplicationContext(),arg0.toString(),Toast.LENGTH_LONG).show();
+			public void onErrorResponse(VolleyError ve) {
+                String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
+                e = e.substring(e.lastIndexOf(":")+1, e.length());
+				Toast.makeText(getApplicationContext(), e,Toast.LENGTH_LONG).show();
 				pDialog.dismiss();
 			}
 		});
@@ -160,12 +164,21 @@ public class MainActivity extends FragmentActivity{
         ConnectivityManager conMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mobile = conMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 
+        /* backup
         // Apakah jaringan tersedia selain jaringan mobile (karena webserver belum di internet)
         if(conMgr.getActiveNetworkInfo() != null && !mobile.isConnected()){
             return true;
         }else {
             return false;
         }
+        */
+
+        if(conMgr.getActiveNetworkInfo() != null){
+            return true;
+        }else {
+            return false;
+        }
+
     }
 
     @Override

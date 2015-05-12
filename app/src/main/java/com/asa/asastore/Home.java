@@ -290,9 +290,13 @@ public class Home extends Fragment {
                         barang.setHarga_barang(harga.getText().toString());
                         barang.setStok_barang(jumlahBarang.getText().toString());
                         barang.setSatuan_barang(satuan.getText().toString());
-                        barang.setId_kategori_barang(MainActivity.listDataKategori.get(kategori.getSelectedItemPosition()).getId_Kategori
-                                ());
-                        barang.setId_penjual(MainActivity.listDataSupplier.get(penjual.getSelectedItemPosition()).getId_penjual());
+
+                        // bug fixed
+                        if(kategori.getSelectedItemPosition() != -1 || penjual.getSelectedItemPosition() != -1){
+                            barang.setId_kategori_barang(MainActivity.listDataKategori.get(kategori.getSelectedItemPosition()).getId_Kategori());
+                            barang.setId_penjual(MainActivity.listDataSupplier.get(penjual.getSelectedItemPosition()).getId_penjual());
+                        }
+
                         barang.setDeskripsi_barang(deskripsi.getText().toString());
                         new NewBarang().execute(barang);
                     }
@@ -328,6 +332,7 @@ public class Home extends Fragment {
                     if(success == 1) {
                         MainActivity.listDataBarang.get(position).setId_favorite(id_favorite);
                         MainActivity.adapterHomeBarang.notifyDataSetChanged();
+                        Toast.makeText(getActivity(), response.getString("message"), Toast.LENGTH_SHORT).show();
                     }else{
                         Toast.makeText(getActivity(), "Error Occurred", Toast.LENGTH_LONG).show();
                     }
@@ -337,8 +342,10 @@ public class Home extends Fragment {
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
+            public void onErrorResponse(VolleyError ve) {
+                String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
+                e = e.substring(e.lastIndexOf(":")+1, e.length());
+                Toast.makeText(getActivity(), e,Toast.LENGTH_LONG).show();
             }
         });
 
@@ -363,6 +370,7 @@ public class Home extends Fragment {
                             if(success == 1) {
                                 MainActivity.listDataBarang.remove(position);
                                 MainActivity.adapterHomeBarang.notifyDataSetChanged();
+                                Toast.makeText(getActivity(), response.getString("message"), Toast.LENGTH_SHORT).show();
                             }else{
                                 Toast.makeText(getActivity(), "Error Occurred", Toast.LENGTH_LONG).show();
                             }
@@ -373,8 +381,10 @@ public class Home extends Fragment {
                 },
                 new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
+                    public void onErrorResponse(VolleyError ve) {
+                        String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
+                        e = e.substring(e.lastIndexOf(":")+1, e.length());
+                        Toast.makeText(getActivity(), e,Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -389,7 +399,7 @@ public class Home extends Fragment {
         param.put("id_barang", id_barang);
 
         // Request yang akan dilakukan
-        MyJsonObjectRequest request = new MyJsonObjectRequest(Request.Method.POST, MainActivity.URL + "clear-favorite",
+        MyJsonObjectRequest request = new MyJsonObjectRequest(Request.Method.POST, MainActivity.URL + "clear-favorite.php",
                 param,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -397,7 +407,7 @@ public class Home extends Fragment {
                         try {
                             int success = response.getInt("success");
                             if(success == 1) {
-                                MainActivity.listDataBarang.remove(position);
+                                MainActivity.listDataBarang.get(position).setId_favorite("");
                                 MainActivity.adapterHomeBarang.notifyDataSetChanged();
                                 Toast.makeText(getActivity(), response.getString("message"), Toast.LENGTH_SHORT).show();
                             }else{
@@ -410,8 +420,10 @@ public class Home extends Fragment {
                 },
                 new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
+                    public void onErrorResponse(VolleyError ve) {
+                        String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
+                        e = e.substring(e.lastIndexOf(":")+1, e.length());
+                        Toast.makeText(getActivity(), e,Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -486,8 +498,10 @@ public class Home extends Fragment {
                 },
                 new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-
+                    public void onErrorResponse(VolleyError ve) {
+                        String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
+                        e = e.substring(e.lastIndexOf(":")+1, e.length());
+                        Toast.makeText(getActivity(), e,Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -690,8 +704,10 @@ public class Home extends Fragment {
                 },
                 new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
+                    public void onErrorResponse(VolleyError ve) {
+                        String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
+                        e = e.substring(e.lastIndexOf(":")+1, e.length());
+                        Toast.makeText(getActivity(), e,Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -744,8 +760,10 @@ public class Home extends Fragment {
                 },
                 new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
+                    public void onErrorResponse(VolleyError ve) {
+                        String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
+                        e = e.substring(e.lastIndexOf(":")+1, e.length());
+                        Toast.makeText(getActivity(), e,Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -839,8 +857,10 @@ public class Home extends Fragment {
                 },
                 new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
+            public void onErrorResponse(VolleyError ve) {
+                String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
+                e = e.substring(e.lastIndexOf(":")+1, e.length());
+                Toast.makeText(getActivity(), e,Toast.LENGTH_LONG).show();
             }
         });
 
@@ -878,8 +898,10 @@ public class Home extends Fragment {
                 },
                 new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getActivity(), error.toString(), Toast.LENGTH_LONG).show();
+                    public void onErrorResponse(VolleyError ve) {
+                        String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
+                        e = e.substring(e.lastIndexOf(":")+1, e.length());
+                        Toast.makeText(getActivity(), e,Toast.LENGTH_LONG).show();
                     }
                 });
 
