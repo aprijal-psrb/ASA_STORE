@@ -298,7 +298,15 @@ public class Home extends Fragment {
                         }
 
                         barang.setDeskripsi_barang(deskripsi.getText().toString());
-                        new NewBarang().execute(barang);
+
+                        // cek data barang
+                        if(barang.getNama_barang().isEmpty() || barang.getNama_merek().isEmpty() || barang.getHarga_barang().isEmpty() ||
+                                barang.getStok_barang().isEmpty() || barang.getSatuan_barang().isEmpty() || barang.getDeskripsi_barang().isEmpty()){
+                            Toast.makeText(getActivity(), "Required field is empty", Toast.LENGTH_LONG).show();
+                        }else{
+                            //new NewBarang().execute(barang);
+                            newBarang(barang);
+                        }
                     }
                 });
                 dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -470,7 +478,7 @@ public class Home extends Fragment {
         param.put("id_penjual", dataBarang.getId_penjual());
         param.put("deskripsi_barang", dataBarang.getDeskripsi_barang());
 
-        // Request untuk yang akan dilakukan
+        // Request yang akan dilakukan
         MyJsonObjectRequest request = new MyJsonObjectRequest(Request.Method.POST, MainActivity.URL + "edit-barang.php",
                 param,
                 new Response.Listener<JSONObject>() {
@@ -547,7 +555,142 @@ public class Home extends Fragment {
         }
     }
     */
+    Map<String, String> param1 = new HashMap<>();
+    private void newBarang(final DataBarang barang){
 
+        // Parameter untuk ke jaringan
+
+        param1.put("id_penjual", barang.getId_penjual());
+        param1.put("nama_barang", barang.getNama_barang());
+        param1.put("harga_barang", barang.getHarga_barang());
+        Time time = new Time(Time.getCurrentTimezone());
+        time.setToNow();
+        String date = time.format("%Y-%m-%d");
+        barang.setTgl_harga_stok_barang(date);
+        param1.put("tgl_harga_stok_barang", date);
+        param1.put("stok_barang", barang.getStok_barang());
+        param1.put("satuan_barang", barang.getSatuan_barang());
+        param1.put("kategori_barang", barang.getId_kategori_barang());
+        param1.put("deskripsi_barang", barang.getDeskripsi_barang());
+
+        if(barang.getId_merek() == null){
+
+            // Parameter untuk ke jaringan
+            final Map<String, String> param2 = new HashMap<>();
+            param2.put("nama_merek", barang.getNama_merek());
+
+            // Request yang akan dilakukan
+            MyJsonObjectRequest request2 = new MyJsonObjectRequest(Request.Method.POST, MainActivity.URL + "add-merek.php",
+                    param2,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject jsonObject) {
+                            try{
+                                Log.d("jsonObjecr", jsonObject.toString());
+                                int success = jsonObject.getInt("success");
+                                if (success == 1){
+                                    JSONArray merekArray = jsonObject.getJSONArray("merek");
+                                    JSONObject c = merekArray.getJSONObject(0);
+                                    String id_merekGet = c.getString("id_merek");
+                                    String nama_merekGet = c.getString("nama_merek");
+                                    String logo_merekGet = c.getString("logo_merek");
+                                    String deskripsi_merekGet = c.getString("deskripsi_merek");
+                                    DataMerek dataMerek = new DataMerek();
+                                    dataMerek.setId_merek(id_merekGet);
+                                    dataMerek.setNama_merek(nama_merekGet);
+                                    dataMerek.setLogo_merek(logo_merekGet);
+                                    dataMerek.setDeskripsi_merek(deskripsi_merekGet);
+                                    MainActivity.listDataMerek.add(dataMerek);
+                                    MainActivity.listMerek.add(nama_merekGet);
+                                    MainActivity.adapterDataMerek.notifyDataSetChanged();
+                                    MainActivity.adapterMerek.notifyDataSetChanged();
+                                    Log.d("id_merekGet", id_merekGet);
+                                    param1.put("id_merek", id_merekGet);
+                                    barang.setId_merek(id_merekGet);
+                                    Log.d("id_merek di param1", param1.get("id_merek"));
+
+                                    // Request yang akan dilakukan ke jaringan
+                                    MyJsonObjectRequest request1 = new MyJsonObjectRequest(Request.Method.POST, MainActivity.URL + "add-barang.php",
+                                            param1,
+                                            new Response.Listener<JSONObject>() {
+                                                @Override
+                                                public void onResponse(JSONObject jsonObject) {
+                                                    Log.d("jsonObject di request1", jsonObject.toString());
+                                                    MainActivity.listDataBarang.add(barang);
+                                                    MainActivity.adapterHomeBarang.notifyDataSetChanged();
+                                                }
+                                            },
+                                            new Response.ErrorListener() {
+                                                @Override
+                                                public void onErrorResponse(VolleyError ve) {
+                                                    Log.e("Error di request1", "Error di request1");
+                                                    String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
+                                                    e = e.substring(e.lastIndexOf(":")+1, e.length());
+                                                    Toast.makeText(getActivity(), ve.toString(),Toast.LENGTH_LONG).show();
+                                                }
+                                            });
+
+                                    // Melakukan request ke jaringan
+                                    AppController.getInstance().addToRequestQueue(request1, "add-barang");
+
+
+                                }else{
+                                    Toast.makeText(getActivity(), "Error occurred!", Toast.LENGTH_LONG).show();
+                                }
+                            }catch (JSONException e){
+                                e.printStackTrace();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError ve) {
+                            Log.e("Error di request2", "Error di request2");
+                            String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
+                            e = e.substring(e.lastIndexOf(":")+1, e.length());
+                            Toast.makeText(getActivity(), e,Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+            // Melakukan request ke jaringan
+            AppController.getInstance().addToRequestQueue(request2, "add-merek");
+
+        }else{
+            param1.put("id_merek", barang.getId_merek());
+
+            // Request yang akan dilakukan ke jaringan
+            MyJsonObjectRequest request1 = new MyJsonObjectRequest(Request.Method.POST, MainActivity.URL + "add-barang.php",
+                    param1,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject jsonObject) {
+                            Log.d("jsonObject di request1", jsonObject.toString());
+                            MainActivity.listDataBarang.add(barang);
+                            MainActivity.adapterHomeBarang.notifyDataSetChanged();
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError ve) {
+                            Log.e("Error di request1", "Error di request1");
+                            String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
+                            e = e.substring(e.lastIndexOf(":")+1, e.length());
+                            Toast.makeText(getActivity(), ve.toString(),Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+            // Melakukan request ke jaringan
+            AppController.getInstance().addToRequestQueue(request1, "add-barang");
+
+        }
+
+        //Log.d("id_merek ======= ", barang.getId_merek());
+
+
+
+    }
+
+    /* data backup
     private class NewBarang extends AsyncTask<DataBarang,Void,Integer>{
         DataBarang barang;
         @Override
@@ -675,6 +818,7 @@ public class Home extends Fragment {
             }
         }
     }
+    */
 
     private void newSupplier(DataSupplier dataSupplier){
 
