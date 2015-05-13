@@ -183,12 +183,12 @@ public class Home extends Fragment {
                                 return true;
                             case R.id.deleteHome:
                                 AlertDialog.Builder dia = new AlertDialog.Builder(getActivity());
-                                dia.setMessage("Are you sure!!!").setPositiveButton("YES",new DialogInterface.OnClickListener() {
+                                dia.setMessage("Are you sure!!!").setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         deleteData(position);
                                     }
-                                }).setNegativeButton("NO",new DialogInterface.OnClickListener() {
+                                }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
 
@@ -213,7 +213,7 @@ public class Home extends Fragment {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
                 View mView = inflater.inflate(R.layout.add_data_barang, null);
                 final EditText nama = (EditText) mView.findViewById(R.id.editText_product_name);
-                final AutoCompleteTextView merek = (AutoCompleteTextView)mView.findViewById(R.id.TextView_product_brand);
+                final AutoCompleteTextView merek = (AutoCompleteTextView) mView.findViewById(R.id.TextView_product_brand);
                 final EditText harga = (EditText) mView.findViewById(R.id.editText_product_price);
                 final EditText jumlahBarang = (EditText) mView.findViewById(R.id.editText_product_stock);
                 final AutoCompleteTextView satuan = (AutoCompleteTextView) mView.findViewById(R.id.autoComp_product_unit);
@@ -226,7 +226,7 @@ public class Home extends Fragment {
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         LayoutInflater inflater = getActivity().getLayoutInflater();
                         View view = inflater.inflate(R.layout.dialog_category, null);
-                        final EditText newCateg = (EditText)view.findViewById(R.id.editTextCategory);
+                        final EditText newCateg = (EditText) view.findViewById(R.id.editTextCategory);
                         builder.setTitle("Add Category");
                         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
@@ -239,16 +239,16 @@ public class Home extends Fragment {
                         builder.show();
                     }
                 });
-                final Button btnAddSupplier = (Button)mView.findViewById(R.id.btn_add_supplier);
+                final Button btnAddSupplier = (Button) mView.findViewById(R.id.btn_add_supplier);
                 final EditText deskripsi = (EditText) mView.findViewById(R.id.editText_product_description);
                 btnAddSupplier.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         AlertDialog.Builder tambahDialog = new AlertDialog.Builder(getActivity());
-                        View viewTambah = inflater.inflate(R.layout.add_data_supplier,null);
-                        final EditText namaToko = (EditText)viewTambah.findViewById(R.id.editText_supplier_name);
-                        final EditText alamatToko = (EditText)viewTambah.findViewById(R.id.editText_supplier_address);
-                        final EditText kontakToko = (EditText)viewTambah.findViewById(R.id.editText_supplier_contact);
+                        View viewTambah = inflater.inflate(R.layout.add_data_supplier, null);
+                        final EditText namaToko = (EditText) viewTambah.findViewById(R.id.editText_supplier_name);
+                        final EditText alamatToko = (EditText) viewTambah.findViewById(R.id.editText_supplier_address);
+                        final EditText kontakToko = (EditText) viewTambah.findViewById(R.id.editText_supplier_contact);
                         tambahDialog.setView(viewTambah);
                         tambahDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
@@ -276,7 +276,7 @@ public class Home extends Fragment {
                 listSatuan.add("Lusin");
                 listSatuan.add("Botol");
                 listSatuan.add("Buah");
-                ArrayAdapter adapterSatuan = new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_1,listSatuan);
+                ArrayAdapter adapterSatuan = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, listSatuan);
                 satuan.setAdapter(adapterSatuan);
                 kategori.setAdapter(MainActivity.adapterNamaKategori);
                 penjual.setAdapter(MainActivity.adapterNamaToko);
@@ -292,7 +292,7 @@ public class Home extends Fragment {
                         barang.setSatuan_barang(satuan.getText().toString());
 
                         // bug fixed
-                        if(kategori.getSelectedItemPosition() != -1 || penjual.getSelectedItemPosition() != -1){
+                        if (kategori.getSelectedItemPosition() != -1 || penjual.getSelectedItemPosition() != -1) {
                             barang.setId_kategori_barang(MainActivity.listDataKategori.get(kategori.getSelectedItemPosition()).getId_Kategori());
                             barang.setId_penjual(MainActivity.listDataSupplier.get(penjual.getSelectedItemPosition()).getId_penjual());
                         }
@@ -300,10 +300,10 @@ public class Home extends Fragment {
                         barang.setDeskripsi_barang(deskripsi.getText().toString());
 
                         // cek data barang
-                        if(barang.getNama_barang().isEmpty() || barang.getNama_merek().isEmpty() || barang.getHarga_barang().isEmpty() ||
-                                barang.getStok_barang().isEmpty() || barang.getSatuan_barang().isEmpty() || barang.getDeskripsi_barang().isEmpty()){
+                        if (barang.getNama_barang().isEmpty() || barang.getNama_merek().isEmpty() || barang.getHarga_barang().isEmpty() ||
+                                barang.getStok_barang().isEmpty() || barang.getSatuan_barang().isEmpty() || barang.getDeskripsi_barang().isEmpty()) {
                             Toast.makeText(getActivity(), "Required field is empty", Toast.LENGTH_LONG).show();
-                        }else{
+                        } else {
                             //new NewBarang().execute(barang);
                             newBarang(barang);
                         }
@@ -575,85 +575,7 @@ public class Home extends Fragment {
 
         if(barang.getId_merek() == null){
 
-            // Parameter untuk ke jaringan
-            final Map<String, String> param2 = new HashMap<>();
-            param2.put("nama_merek", barang.getNama_merek());
-
-            // Request yang akan dilakukan
-            MyJsonObjectRequest request2 = new MyJsonObjectRequest(Request.Method.POST, MainActivity.URL + "add-merek.php",
-                    param2,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject jsonObject) {
-                            try{
-                                Log.d("jsonObjecr", jsonObject.toString());
-                                int success = jsonObject.getInt("success");
-                                if (success == 1){
-                                    JSONArray merekArray = jsonObject.getJSONArray("merek");
-                                    JSONObject c = merekArray.getJSONObject(0);
-                                    String id_merekGet = c.getString("id_merek");
-                                    String nama_merekGet = c.getString("nama_merek");
-                                    String logo_merekGet = c.getString("logo_merek");
-                                    String deskripsi_merekGet = c.getString("deskripsi_merek");
-                                    DataMerek dataMerek = new DataMerek();
-                                    dataMerek.setId_merek(id_merekGet);
-                                    dataMerek.setNama_merek(nama_merekGet);
-                                    dataMerek.setLogo_merek(logo_merekGet);
-                                    dataMerek.setDeskripsi_merek(deskripsi_merekGet);
-                                    MainActivity.listDataMerek.add(dataMerek);
-                                    MainActivity.listMerek.add(nama_merekGet);
-                                    MainActivity.adapterDataMerek.notifyDataSetChanged();
-                                    MainActivity.adapterMerek.notifyDataSetChanged();
-                                    param1.put("id_merek", id_merekGet);
-                                    barang.setId_merek(id_merekGet);
-
-                                    // Request yang akan dilakukan ke jaringan
-                                    StringRequest request1 = new StringRequest(Request.Method.POST, MainActivity.URL + "add-barang.php",
-                                            new Response.Listener<String>() {
-                                                @Override
-                                                public void onResponse(String s) {
-                                                    Log.d("Response", s);
-                                                    MainActivity.listDataBarang.add(barang);
-                                                    MainActivity.adapterHomeBarang.notifyDataSetChanged();
-                                                    Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
-                                                }
-                                            },
-                                            new Response.ErrorListener() {
-                                                @Override
-                                                public void onErrorResponse(VolleyError ve) {
-                                                    String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
-                                                    e = e.substring(e.lastIndexOf(":")+1, e.length());
-                                                    Toast.makeText(getActivity(), e,Toast.LENGTH_LONG).show();
-                                                }
-                                            }){
-                                        @Override
-                                        protected Map<String, String> getParams(){
-                                            return param1;
-                                        }
-                                    };
-
-                                    // Melakukan request ke jaringan
-                                    AppController.getInstance().addToRequestQueue(request1, "add-barang");
-
-                                }else{
-                                    Toast.makeText(getActivity(), "Error occurred!", Toast.LENGTH_LONG).show();
-                                }
-                            }catch (JSONException e){
-                                e.printStackTrace();
-                            }
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError ve) {
-                            String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
-                            e = e.substring(e.lastIndexOf(":")+1, e.length());
-                            Toast.makeText(getActivity(), e,Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-            // Melakukan request ke jaringan
-            AppController.getInstance().addToRequestQueue(request2, "add-merek");
+           addMerekDanBarang(barang, param1);
 
         }else{
             param1.put("id_merek", barang.getId_merek());
@@ -687,6 +609,89 @@ public class Home extends Fragment {
             AppController.getInstance().addToRequestQueue(request1, "add-barang");
 
         }
+    }
+
+    private void addMerekDanBarang(final DataBarang barang, final Map<String, String> param){
+
+        // Parameter untuk ke jaringan
+        final Map<String, String> param2 = new HashMap<>();
+        param2.put("nama_merek", barang.getNama_merek());
+
+        // Request yang akan dilakukan
+        MyJsonObjectRequest request2 = new MyJsonObjectRequest(Request.Method.POST, MainActivity.URL + "add-merek.php",
+                param2,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObject) {
+                        try{
+                            Log.d("jsonObjecr", jsonObject.toString());
+                            int success = jsonObject.getInt("success");
+                            if (success == 1){
+                                JSONArray merekArray = jsonObject.getJSONArray("merek");
+                                JSONObject c = merekArray.getJSONObject(0);
+                                String id_merekGet = c.getString("id_merek");
+                                String nama_merekGet = c.getString("nama_merek");
+                                String logo_merekGet = c.getString("logo_merek");
+                                String deskripsi_merekGet = c.getString("deskripsi_merek");
+                                DataMerek dataMerek = new DataMerek();
+                                dataMerek.setId_merek(id_merekGet);
+                                dataMerek.setNama_merek(nama_merekGet);
+                                dataMerek.setLogo_merek(logo_merekGet);
+                                dataMerek.setDeskripsi_merek(deskripsi_merekGet);
+                                MainActivity.listDataMerek.add(dataMerek);
+                                MainActivity.listMerek.add(nama_merekGet);
+                                MainActivity.adapterDataMerek.notifyDataSetChanged();
+                                MainActivity.adapterMerek.notifyDataSetChanged();
+                                param.put("id_merek", id_merekGet);
+                                barang.setId_merek(id_merekGet);
+
+                                // Request yang akan dilakukan ke jaringan
+                                StringRequest request1 = new StringRequest(Request.Method.POST, MainActivity.URL + "add-barang.php",
+                                        new Response.Listener<String>() {
+                                            @Override
+                                            public void onResponse(String s) {
+                                                Log.d("Response", s);
+                                                MainActivity.listDataBarang.add(barang);
+                                                MainActivity.adapterHomeBarang.notifyDataSetChanged();
+                                                Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+                                            }
+                                        },
+                                        new Response.ErrorListener() {
+                                            @Override
+                                            public void onErrorResponse(VolleyError ve) {
+                                                String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
+                                                e = e.substring(e.lastIndexOf(":")+1, e.length());
+                                                Toast.makeText(getActivity(), e,Toast.LENGTH_LONG).show();
+                                            }
+                                        }){
+                                    @Override
+                                    protected Map<String, String> getParams(){
+                                        return param;
+                                    }
+                                };
+
+                                // Melakukan request ke jaringan
+                                AppController.getInstance().addToRequestQueue(request1, "add-barang");
+
+                            }else{
+                                Toast.makeText(getActivity(), "Error occurred!", Toast.LENGTH_LONG).show();
+                            }
+                        }catch (JSONException e){
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError ve) {
+                        String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
+                        e = e.substring(e.lastIndexOf(":")+1, e.length());
+                        Toast.makeText(getActivity(), e,Toast.LENGTH_LONG).show();
+                    }
+                });
+
+        // Melakukan request ke jaringan
+        AppController.getInstance().addToRequestQueue(request2, "add-merek");
     }
 
     /* data backup
