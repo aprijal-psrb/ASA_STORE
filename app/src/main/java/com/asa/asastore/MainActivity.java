@@ -32,7 +32,7 @@ import java.util.List;
 public class MainActivity extends FragmentActivity{
 
     // Sesuaikan dengan IP localhost.
-	public static String URL = "http://10.42.0.1/asa/asastore/";
+	public static String URL = "http://192.168.173.1/asa/asastore/";
 
     public static JSONParser jsonParser = new JSONParser();
     public static AdapterBarang adapterHomeBarang;
