@@ -555,11 +555,11 @@ public class Home extends Fragment {
         }
     }
     */
-    Map<String, String> param1 = new HashMap<>();
+
     private void newBarang(final DataBarang barang){
 
         // Parameter untuk ke jaringan
-
+        final Map<String, String> param1 = new HashMap<>();
         param1.put("id_penjual", barang.getId_penjual());
         param1.put("nama_barang", barang.getNama_barang());
         param1.put("harga_barang", barang.getHarga_barang());
@@ -604,35 +604,36 @@ public class Home extends Fragment {
                                     MainActivity.listMerek.add(nama_merekGet);
                                     MainActivity.adapterDataMerek.notifyDataSetChanged();
                                     MainActivity.adapterMerek.notifyDataSetChanged();
-                                    Log.d("id_merekGet", id_merekGet);
                                     param1.put("id_merek", id_merekGet);
                                     barang.setId_merek(id_merekGet);
-                                    Log.d("id_merek di param1", param1.get("id_merek"));
 
                                     // Request yang akan dilakukan ke jaringan
-                                    MyJsonObjectRequest request1 = new MyJsonObjectRequest(Request.Method.POST, MainActivity.URL + "add-barang.php",
-                                            param1,
-                                            new Response.Listener<JSONObject>() {
+                                    StringRequest request1 = new StringRequest(Request.Method.POST, MainActivity.URL + "add-barang.php",
+                                            new Response.Listener<String>() {
                                                 @Override
-                                                public void onResponse(JSONObject jsonObject) {
-                                                    Log.d("jsonObject di request1", jsonObject.toString());
+                                                public void onResponse(String s) {
+                                                    Log.d("Response", s);
                                                     MainActivity.listDataBarang.add(barang);
                                                     MainActivity.adapterHomeBarang.notifyDataSetChanged();
+                                                    Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
                                                 }
                                             },
                                             new Response.ErrorListener() {
                                                 @Override
                                                 public void onErrorResponse(VolleyError ve) {
-                                                    Log.e("Error di request1", "Error di request1");
                                                     String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
                                                     e = e.substring(e.lastIndexOf(":")+1, e.length());
-                                                    Toast.makeText(getActivity(), ve.toString(),Toast.LENGTH_LONG).show();
+                                                    Toast.makeText(getActivity(), e,Toast.LENGTH_LONG).show();
                                                 }
-                                            });
+                                            }){
+                                        @Override
+                                        protected Map<String, String> getParams(){
+                                            return param1;
+                                        }
+                                    };
 
                                     // Melakukan request ke jaringan
                                     AppController.getInstance().addToRequestQueue(request1, "add-barang");
-
 
                                 }else{
                                     Toast.makeText(getActivity(), "Error occurred!", Toast.LENGTH_LONG).show();
@@ -645,7 +646,6 @@ public class Home extends Fragment {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError ve) {
-                            Log.e("Error di request2", "Error di request2");
                             String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
                             e = e.substring(e.lastIndexOf(":")+1, e.length());
                             Toast.makeText(getActivity(), e,Toast.LENGTH_LONG).show();
@@ -659,35 +659,34 @@ public class Home extends Fragment {
             param1.put("id_merek", barang.getId_merek());
 
             // Request yang akan dilakukan ke jaringan
-            MyJsonObjectRequest request1 = new MyJsonObjectRequest(Request.Method.POST, MainActivity.URL + "add-barang.php",
-                    param1,
-                    new Response.Listener<JSONObject>() {
+            StringRequest request1 = new StringRequest(Request.Method.POST, MainActivity.URL + "add-barang.php",
+                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(JSONObject jsonObject) {
-                            Log.d("jsonObject di request1", jsonObject.toString());
+                        public void onResponse(String s) {
+                            Log.d("Response", s);
                             MainActivity.listDataBarang.add(barang);
                             MainActivity.adapterHomeBarang.notifyDataSetChanged();
+                            Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
                         }
                     },
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError ve) {
-                            Log.e("Error di request1", "Error di request1");
                             String e = ve.toString().substring(ve.toString().lastIndexOf(".")+1, ve.toString().length());
                             e = e.substring(e.lastIndexOf(":")+1, e.length());
-                            Toast.makeText(getActivity(), ve.toString(),Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), e,Toast.LENGTH_LONG).show();
                         }
-                    });
+                    }){
+                @Override
+                protected Map<String, String> getParams(){
+                    return param1;
+                }
+            };
 
             // Melakukan request ke jaringan
             AppController.getInstance().addToRequestQueue(request1, "add-barang");
 
         }
-
-        //Log.d("id_merek ======= ", barang.getId_merek());
-
-
-
     }
 
     /* data backup
